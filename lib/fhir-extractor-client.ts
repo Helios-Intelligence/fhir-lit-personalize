@@ -99,8 +99,9 @@ export function extractPatientDataClient(bundle: any): SerializedPatient {
 
     // Extract birth date and calculate age
     if (patientResource.birthDate) {
-      birthDate = patientResource.birthDate;
-      const birth = new Date(birthDate);
+      const patientBirthDate = patientResource.birthDate as string;
+      birthDate = patientBirthDate;
+      const birth = new Date(patientBirthDate);
       const today = new Date();
       age = today.getFullYear() - birth.getFullYear();
       const monthDiff = today.getMonth() - birth.getMonth();
