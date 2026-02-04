@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "applicability": {
+    "isApplicable": true,
+    "reasons": []
+  },
+  "personalizedResult": {
+    "studySummary": "This study used a powerful computer model to predict the risk of heart problems like heart attacks in a large group of people. The model was able to identify important factors that contribute to heart disease.",
+    "patientProjection": "This study didn't test a specific treatment or intervention. Instead, it identified risk factors for cardiovascular disease and myocardial infarction using a sophisticated model. Since you have type 2 diabetes, hypertension, and hyperlipidemia, the model suggests you may be at higher risk for these conditions. Managing these conditions well is important for your heart health.",
+    "contextualizedRisk": "Because this study focused on prediction rather than a specific treatment, it's hard to say exactly how it applies to you in terms of 'N out of 100' people. However, the study highlights the importance of managing your diabetes, blood pressure, and cholesterol to lower your risk of heart problems. Talk to your doctor about the best ways to manage your conditions and reduce your overall risk."
+  },
+  "patientSummary": {
+    "age": 52,
+    "sex": "male",
+    "relevantBiomarkers": [],
+    "relevantConditions": [
+      "Type 2 Diabetes Mellitus",
+      "Essential Hypertension",
+      "Hyperlipidemia"
+    ],
+    "relevantMedications": [
+      "Metformin 1000mg",
+      "Lisinopril 10mg",
+      "Atorvastatin 20mg"
+    ]
+  },
+  "paperSummary": {
+    "title": "Predicting cardiovascular diseases using imbalanced data: An XGBoost-based analysis of the 2022 BRFSS dataset",
+    "intervention": "XGBoost machine learning model",
+    "primaryEndpoint": "Predicting cardiovascular disease (CVD) and myocardial infarction (MI)",
+    "population": "Non-institutionalized civilian population of the United States aged 18 years and older"
+  }
+}

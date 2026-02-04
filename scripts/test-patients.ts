@@ -27,6 +27,7 @@ interface TestResult {
   applicable?: boolean;
   error?: string;
   summary?: string;
+  fullResponse?: any;
 }
 
 async function fetchPaperText(baseUrl: string, pmid: string): Promise<string> {
@@ -106,6 +107,7 @@ async function personalizeForPatient(
         success: true,
         applicable: true,
         summary: data.personalizedResult.studySummary,
+        fullResponse: data,
       };
     } else {
       const reasons = data.applicability?.reasons?.map((r: any) => r.description).join('; ') || 'Unknown';
@@ -116,6 +118,7 @@ async function personalizeForPatient(
         success: true,
         applicable: false,
         error: reasons,
+        fullResponse: data,
       };
     }
   } catch (error) {
@@ -136,6 +139,12 @@ async function main() {
   const pmid = pmidIndex !== -1 ? args[pmidIndex + 1] : '28864332';
 
   const baseUrl = useLocal ? LOCAL_URL : VERCEL_URL;
+
+  // Create output directory for responses
+  const outputDir = path.join(__dirname, '..', 'test-results');
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
 
   console.log('='.repeat(60));
   console.log('FHIR Literature Personalization - Patient Test Suite');
@@ -178,6 +187,13 @@ async function main() {
 
       const result = await personalizeForPatient(baseUrl, fhirBundle, parsedPaper, file);
       results.push(result);
+
+      // Save full response to file
+      if (result.fullResponse) {
+        const outputFile = path.join(outputDir, `${file.replace('.json', '')}-result.json`);
+        fs.writeFileSync(outputFile, JSON.stringify(result.fullResponse, null, 2));
+        console.log(`  Saved to: ${outputFile}`);
+      }
     }
 
     // Summary

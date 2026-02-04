@@ -60,9 +60,9 @@ export interface PatientSummary {
  */
 export interface PaperSummary {
   title?: string;
-  intervention: string;
-  primaryEndpoint: string;
-  population: string;
+  intervention?: string;
+  primaryEndpoint?: string;
+  population?: string;
   followUp?: string;
 }
 

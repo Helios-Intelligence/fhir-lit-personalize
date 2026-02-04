@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "applicability": {
+    "isApplicable": true,
+    "reasons": []
+  },
+  "personalizedResult": {
+    "studySummary": "A recent study used a powerful computer model to predict the risk of cardiovascular disease and heart attacks based on a large health dataset. The model was able to identify patterns that could help doctors better understand who is at higher risk.",
+    "patientProjection": "This study didn't directly test a treatment or intervention, but it used data from over 200,000 people to build a model for predicting heart issues. Since you are currently taking atorvastatin, which helps lower cholesterol, this model could potentially help your doctor assess if there are other factors that might increase your risk, even with medication.",
+    "contextualizedRisk": "Because this study focused on prediction rather than treatment, it's hard to say exactly how it applies to you. However, the model could help doctors identify, for example, that among 100 people like you, perhaps 5 more might be at risk for a heart attack over the next few years than previously thought, prompting closer monitoring and preventative measures."
+  },
+  "patientSummary": {
+    "age": 34,
+    "sex": "male",
+    "relevantBiomarkers": [],
+    "relevantConditions": [],
+    "relevantMedications": [
+      "atorvastatin calcium 10 MG Oral Tablet",
+      "SUMAtriptan succinate 50 MG Oral Tablet",
+      "propranolol HCl 10 MG Oral Tablet",
+      "ondansetron 4 MG Disintegrating Oral Tablet",
+      "amoxicillin 875 MG / clavulanate potassium 125 MG Oral Tablet",
+      "cholecalciferol 1.25 MG (50,000 UNT) Oral Capsule",
+      "Advil 200 MG Oral Capsule",
+      "methylPREDNISolone 4 MG Oral Tablet",
+      "amoxicillin 875 MG / clavulanate potassium 125 MG Oral Tablet",
+      "Drug or medicament (substance)",
+      "Drug or medicament (substance)"
+    ]
+  },
+  "paperSummary": {
+    "title": "Predicting cardiovascular diseases using imbalanced data: An XGBoost-based analysis of the 2022 BRFSS dataset",
+    "intervention": "XGBoost machine learning model",
+    "primaryEndpoint": "Predicting cardiovascular disease (CVD) and myocardial infarction (MI)",
+    "population": "Non-institutionalized civilian population of the United States aged 18 years and older"
+  }
+}

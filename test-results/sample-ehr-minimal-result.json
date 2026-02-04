@@ -1,0 +1,25 @@
+{
+  "success": true,
+  "applicability": {
+    "isApplicable": true,
+    "reasons": []
+  },
+  "personalizedResult": {
+    "studySummary": "This study used a powerful machine learning model called XGBoost to predict the risk of cardiovascular disease (CVD) and heart attacks (myocardial infarction or MI) using data from a large health survey. The model was able to identify important factors that contribute to these conditions.",
+    "patientProjection": "As a 40-year-old male, your risk factors would be evaluated by the XGBoost model in a similar way to the individuals in the study. The model considers various factors to estimate your likelihood of developing CVD or experiencing a heart attack. Since I don't have your specific health data, I can't give you a precise prediction, but the study suggests that this type of model can be helpful in identifying potential risks.",
+    "contextualizedRisk": "This study didn't track patients over time to see how many actually developed CVD or MI. Instead, it focused on building a tool to predict risk. While I can't say how many out of 100 people like you might avoid CVD or MI based on this study, understanding your risk factors is a crucial first step in taking proactive steps to protect your heart health."
+  },
+  "patientSummary": {
+    "age": 40,
+    "sex": "male",
+    "relevantBiomarkers": [],
+    "relevantConditions": [],
+    "relevantMedications": []
+  },
+  "paperSummary": {
+    "title": "Predicting cardiovascular diseases using imbalanced data: An XGBoost-based analysis of the 2022 BRFSS dataset",
+    "intervention": "XGBoost machine learning model",
+    "primaryEndpoint": "Predicting cardiovascular disease (CVD) and myocardial infarction (MI)",
+    "population": "Non-institutionalized civilian population of the United States aged 18 years and older"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "success": true,
+  "applicability": {
+    "isApplicable": true,
+    "reasons": []
+  },
+  "personalizedResult": {
+    "studySummary": "A recent study used a powerful computer model to predict the risk of heart problems like heart attack and cardiovascular disease. The model was trained on a large dataset to identify factors that contribute to these conditions.",
+    "patientProjection": "This study didn't look at a specific treatment or intervention, but rather focused on predicting risk. Given your age, sex, and existing conditions like coronary artery disease, atrial fibrillation, heart failure, and hypertension, the model might be used to estimate your individual risk of developing cardiovascular disease or experiencing a heart attack. Keep in mind that this is a prediction based on population data, and your actual risk may vary.",
+    "contextualizedRisk": "Because this study focused on prediction rather than a specific treatment, it's difficult to translate the findings into a direct benefit for you in terms of 'N out of 100' people avoiding an event. However, understanding your predicted risk can help you and your doctor make informed decisions about managing your health. For example, if the model suggests your risk is higher than average, you might discuss intensifying lifestyle modifications or considering additional monitoring."
+  },
+  "patientSummary": {
+    "age": 65,
+    "sex": "female",
+    "relevantBiomarkers": [],
+    "relevantConditions": [
+      "Coronary Artery Disease",
+      "Atrial Fibrillation",
+      "Heart Failure with Preserved Ejection Fraction",
+      "Hypertension"
+    ],
+    "relevantMedications": [
+      "Metoprolol Succinate 50mg",
+      "Apixaban 5mg",
+      "Rosuvastatin 20mg",
+      "Furosemide 40mg",
+      "Lisinopril 20mg"
+    ]
+  },
+  "paperSummary": {
+    "title": "Predicting cardiovascular diseases using imbalanced data: An XGBoost-based analysis of the 2022 BRFSS dataset",
+    "intervention": "XGBoost machine learning model",
+    "primaryEndpoint": "Predicting cardiovascular disease (CVD) and myocardial infarction (MI)",
+    "population": "Non-institutionalized civilian population of the United States aged 18 years and older"
+  }
+}

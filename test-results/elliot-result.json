@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "applicability": {
+    "isApplicable": true,
+    "reasons": []
+  },
+  "personalizedResult": {
+    "studySummary": "A recent study used a powerful computer model to predict the risk of cardiovascular disease and heart attacks based on health data from over 200,000 people. The model showed promise in identifying those at higher risk.",
+    "patientProjection": "This study focused on predicting cardiovascular disease. While it didn't test a specific treatment, it used data similar to yours to identify risk factors. Since you are a 42-year-old male, the model's findings might help your doctor better understand your individual risk profile based on factors considered in the study.",
+    "contextualizedRisk": "This study focused on prediction, not intervention. However, understanding your risk is the first step. If 100 people with a similar risk profile to yours were identified using this model, it could help doctors focus preventative efforts on those most likely to benefit. Since the study didn't involve a specific treatment, we can't say how many fewer heart events might occur over a specific time period."
+  },
+  "patientSummary": {
+    "age": 42,
+    "sex": "male",
+    "relevantBiomarkers": [],
+    "relevantConditions": [],
+    "relevantMedications": [
+      "valACYclovir 500 MG Oral Tablet",
+      "loratadine (CLARITIN) 10 mg tablet",
+      "valACYclovir 500 MG Oral Tablet",
+      "SUMAtriptan succinate 25 MG Oral Tablet",
+      "ondansetron HCl 4 MG Oral Tablet",
+      "rizatriptan benzoate 10 MG Oral Tablet",
+      "valACYclovir 500 MG Oral Tablet",
+      "amoxicillin 875 MG Oral Tablet",
+      "levoFLOXacin 500 MG Oral Tablet",
+      "Claritin",
+      "Vitamin D",
+      "Nurtec ODT 75 MG Disintegrating Oral Tablet",
+      "Maxalt 10 MG Oral Tablet",
+      "rimegepant 75 MG Disintegrating Oral Tablet",
+      "valACYclovir 500 MG Oral Tablet",
+      "loratadine 10 MG 24HR Oral Capsule",
+      "levoFLOXacin 500 MG Oral Tablet",
+      "valACYclovir 500 MG Oral Tablet"
+    ]
+  },
+  "paperSummary": {
+    "title": "Predicting cardiovascular diseases using imbalanced data: An XGBoost-based analysis of the 2022 BRFSS dataset",
+    "intervention": "XGBoost machine learning model",
+    "primaryEndpoint": "Predicting cardiovascular disease (CVD) and myocardial infarction (MI)",
+    "population": "Non-institutionalized civilian population of the United States aged 18 years and older"
+  }
+}

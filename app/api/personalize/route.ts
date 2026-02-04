@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
 
     // Create paper summary for response
     const paperSummary: PaperSummary = {
-      title: parsedPaper.title,
-      intervention: parsedPaper.intervention,
-      primaryEndpoint: parsedPaper.primaryEndpoint,
-      population: parsedPaper.inclusionCriteria,
+      title: parsedPaper.title ?? undefined,
+      intervention: parsedPaper.intervention ?? undefined,
+      primaryEndpoint: parsedPaper.primaryEndpoint ?? undefined,
+      population: parsedPaper.inclusionCriteria ?? undefined,
       followUp: parsedPaper.followUpDuration ?? undefined,
     };
 
