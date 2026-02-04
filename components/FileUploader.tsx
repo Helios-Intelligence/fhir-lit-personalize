@@ -93,7 +93,8 @@ export function FileUploader({ onFileAccepted, onError, disabled }: FileUploader
     setFileSize(null);
     setIsValid(null);
     setIsLoading(false);
-  }, []);
+    onFileAccepted(null); // Notify parent that file was cleared
+  }, [onFileAccepted]);
 
   return (
     <div className="space-y-2">

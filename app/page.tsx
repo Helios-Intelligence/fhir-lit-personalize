@@ -35,7 +35,14 @@ export default function Home() {
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFhirAccepted = useCallback((bundle: any) => {
+  const handleFhirAccepted = useCallback((bundle: any | null) => {
+    if (bundle === null) {
+      // File was cleared
+      setFhirBundle(null);
+      setExtractedPatient(null);
+      return;
+    }
+
     setFhirBundle(bundle);
     setError(null);
 
@@ -149,8 +156,9 @@ export default function Home() {
     setError(null);
   };
 
-  const canRun = extractedPatient && paperText && currentStep === "idle";
   const isProcessing = !["idle", "complete", "error"].includes(currentStep);
+  // Can run if we have data and not currently processing
+  const canRun = extractedPatient && paperText && !isProcessing;
 
   // Get display title from metadata or parsed paper
   const displayTitle = parsedPaper?.title || paperMetadata?.title;
