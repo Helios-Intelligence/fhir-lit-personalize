@@ -55,6 +55,7 @@ export function PaperInput({
   isLoading,
 }: PaperInputProps) {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfProcessed, setPdfProcessed] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -66,6 +67,7 @@ export function PaperInput({
   const handlePdfUpload = useCallback(
     async (file: File) => {
       setPdfFile(file);
+      setPdfProcessed(false);
       setIsUploading(true);
       setFetchedPaper(null);
       setFetchError(null);
@@ -86,12 +88,14 @@ export function PaperInput({
           throw new Error(data.error || "Failed to process PDF");
         }
 
+        setPdfProcessed(true);
         onPaperText(data.text, "pdf");
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Failed to upload PDF";
         onError(message);
         setPdfFile(null);
+        setPdfProcessed(false);
       } finally {
         setIsUploading(false);
       }
@@ -196,6 +200,7 @@ export function PaperInput({
 
   const clearPdf = useCallback(() => {
     setPdfFile(null);
+    setPdfProcessed(false);
   }, []);
 
   const clearIdentifier = useCallback(() => {
@@ -230,9 +235,14 @@ export function PaperInput({
         {pdfFile ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100">
+              <div className={cn(
+                "p-2 rounded-lg",
+                pdfProcessed ? "bg-green-100" : "bg-blue-100"
+              )}>
                 {isUploading ? (
                   <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+                ) : pdfProcessed ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-600" />
                 ) : (
                   <FileText className="w-5 h-5 text-blue-600" />
                 )}
@@ -241,9 +251,14 @@ export function PaperInput({
                 <p className="text-sm font-medium text-gray-900">
                   {pdfFile.name}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className={cn(
+                  "text-xs",
+                  pdfProcessed ? "text-green-600" : "text-gray-500"
+                )}>
                   {isUploading
                     ? "Extracting text..."
+                    : pdfProcessed
+                    ? "Text extracted successfully"
                     : `${(pdfFile.size / 1024 / 1024).toFixed(2)} MB`}
                 </p>
               </div>
