@@ -13,12 +13,21 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { PipelineStep, PipelineResult } from "@/lib/types/result";
 import type { ParsedPaper } from "@/lib/types/paper";
 
+interface PaperMetadata {
+  title?: string;
+  authors?: string[];
+  journal?: string;
+  pmid?: string;
+  doi?: string;
+}
+
 export default function Home() {
   const [fhirBundle, setFhirBundle] = useState<any>(null);
   const [paperText, setPaperText] = useState<string | null>(null);
   const [paperSource, setPaperSource] = useState<"pdf" | "pmid" | "doi" | null>(
     null
   );
+  const [paperMetadata, setPaperMetadata] = useState<PaperMetadata | null>(null);
   const [parsedPaper, setParsedPaper] = useState<ParsedPaper | null>(null);
   const [currentStep, setCurrentStep] = useState<PipelineStep>("idle");
   const [result, setResult] = useState<PipelineResult | null>(null);
@@ -30,9 +39,10 @@ export default function Home() {
   }, []);
 
   const handlePaperText = useCallback(
-    (text: string, source: "pdf" | "pmid" | "doi") => {
+    (text: string, source: "pdf" | "pmid" | "doi", metadata?: PaperMetadata) => {
       setPaperText(text);
       setPaperSource(source);
+      setPaperMetadata(metadata || null);
       setError(null);
     },
     []
@@ -58,6 +68,7 @@ export default function Home() {
         body: JSON.stringify({
           paperText,
           source: paperSource,
+          metadata: paperMetadata, // Pass metadata to parser
         }),
       });
 
@@ -67,6 +78,12 @@ export default function Home() {
       }
 
       const parsed = parseData.parsedPaper as ParsedPaper;
+
+      // Use metadata title if parsed title is missing
+      if (!parsed.title && paperMetadata?.title) {
+        parsed.title = paperMetadata.title;
+      }
+
       setParsedPaper(parsed);
 
       // Steps 2-4: Personalize
@@ -112,6 +129,7 @@ export default function Home() {
     setFhirBundle(null);
     setPaperText(null);
     setPaperSource(null);
+    setPaperMetadata(null);
     setParsedPaper(null);
     setCurrentStep("idle");
     setResult(null);
@@ -120,6 +138,9 @@ export default function Home() {
 
   const canRun = fhirBundle && paperText && currentStep === "idle";
   const isProcessing = !["idle", "complete", "error"].includes(currentStep);
+
+  // Get display title from metadata or parsed paper
+  const displayTitle = parsedPaper?.title || paperMetadata?.title;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -212,31 +233,37 @@ export default function Home() {
             {parsedPaper && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-base font-semibold text-gray-900 mb-3">
-                  Study: {parsedPaper.title || "Untitled"}
+                  Study: {displayTitle || "Untitled"}
                 </h3>
                 <div className="space-y-2 text-sm">
-                  <p>
-                    <span className="font-medium text-gray-700">
-                      Intervention:
-                    </span>{" "}
-                    <span className="text-gray-600">
-                      {parsedPaper.intervention}
-                    </span>
-                  </p>
-                  <p>
-                    <span className="font-medium text-gray-700">
-                      Primary Endpoint:
-                    </span>{" "}
-                    <span className="text-gray-600">
-                      {parsedPaper.primaryEndpoint}
-                    </span>
-                  </p>
-                  <p>
-                    <span className="font-medium text-gray-700">Follow-up:</span>{" "}
-                    <span className="text-gray-600">
-                      {parsedPaper.followUpDuration}
-                    </span>
-                  </p>
+                  {parsedPaper.intervention && (
+                    <p>
+                      <span className="font-medium text-gray-700">
+                        Intervention:
+                      </span>{" "}
+                      <span className="text-gray-600">
+                        {parsedPaper.intervention}
+                      </span>
+                    </p>
+                  )}
+                  {parsedPaper.primaryEndpoint && (
+                    <p>
+                      <span className="font-medium text-gray-700">
+                        Primary Endpoint:
+                      </span>{" "}
+                      <span className="text-gray-600">
+                        {parsedPaper.primaryEndpoint}
+                      </span>
+                    </p>
+                  )}
+                  {parsedPaper.followUpDuration && (
+                    <p>
+                      <span className="font-medium text-gray-700">Follow-up:</span>{" "}
+                      <span className="text-gray-600">
+                        {parsedPaper.followUpDuration}
+                      </span>
+                    </p>
+                  )}
                   {parsedPaper.keyFindings.hazardRatio && (
                     <p>
                       <span className="font-medium text-gray-700">

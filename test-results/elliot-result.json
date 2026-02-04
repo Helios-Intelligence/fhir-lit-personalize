@@ -5,13 +5,13 @@
     "reasons": [
       {
         "type": "condition",
-        "description": "Patient does not have required condition: Premature coronary artery disease",
-        "details": "The study required patients to have Premature coronary artery disease"
+        "description": "Patient does not have required condition: atherosclerotic cardiovascular disease",
+        "details": "The study required patients to have atherosclerotic cardiovascular disease"
       },
       {
-        "type": "biomarker",
-        "description": "Missing biomarker data: lipoprotein(a)",
-        "details": "The study results are based on lipoprotein(a) levels, which are not in the patient's records"
+        "type": "medication",
+        "description": "Patient is not on required medication: statin therapy",
+        "details": "The study required patients to be taking statin therapy"
       }
     ]
   },
@@ -20,26 +20,8 @@
     "sex": "male",
     "relevantBiomarkers": [
       {
-        "name": "Cholesterol in HDL [Mass/volume] in Serum or Plasma",
-        "value": "55",
-        "unit": "mg/dL",
-        "date": "2023-03-07T16:18:17.000Z"
-      },
-      {
-        "name": "Cholesterol [Mass/volume] in Serum or Plasma",
-        "value": "182",
-        "unit": "mg/dL",
-        "date": "2023-03-07T16:18:17.000Z"
-      },
-      {
         "name": "Cholesterol in LDL [Mass/volume] in Serum or Plasma by Direct assay",
         "value": "110",
-        "unit": "mg/dL",
-        "date": "2023-03-07T16:18:17.000Z"
-      },
-      {
-        "name": "Triglyceride [Mass/volume] in Serum or Plasma",
-        "value": "85",
         "unit": "mg/dL",
         "date": "2023-03-07T16:18:17.000Z"
       }
@@ -67,9 +49,9 @@
     ]
   },
   "paperSummary": {
-    "title": "Premature coronary artery disease in women: sex-specific risk factors, pathogenetic mechanisms and clinical implications",
-    "intervention": "Aggressive lipid control, metabolic risk reduction, and psychosocial support",
-    "primaryEndpoint": "Early detection and tailored treatment of female PCAD",
-    "population": "Women with premature coronary artery disease (PCAD), defined as onset ≤65 years"
+    "intervention": "evolocumab (either 140 mg every 2 weeks or 420 mg monthly)",
+    "primaryEndpoint": "composite of cardiovascular death, myocardial infarction, stroke, hospitalization for unstable angina, or coronary revascularization",
+    "population": "Patients with atherosclerotic cardiovascular disease and LDL cholesterol levels of 70 mg per deciliter (1.8 mmol per liter) or higher who were receiving statin therapy.",
+    "followUp": "2.2 years median"
   }
 }
