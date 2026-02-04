@@ -31,9 +31,9 @@ export const ParsedPaperSchema = z.object({
     nnt: z.number().optional().nullable().describe('Number needed to treat'),
   }),
   followUpDuration: z.string().optional().nullable().describe('Follow-up duration (e.g., "2.2 years median")'),
-  baselineEventRate: z.number().optional().describe('Baseline event rate in control group as decimal'),
-  sampleSize: z.number().optional().describe('Total number of participants'),
-  studyDesign: z.string().optional().describe('Study design (e.g., RCT, cohort)'),
+  baselineEventRate: z.number().optional().nullable().describe('Baseline event rate in control group as decimal'),
+  sampleSize: z.number().optional().nullable().describe('Total number of participants'),
+  studyDesign: z.string().optional().nullable().describe('Study design (e.g., RCT, cohort)'),
 });
 
 export type ParsedPaper = z.infer<typeof ParsedPaperSchema>;
