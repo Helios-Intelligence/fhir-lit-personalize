@@ -4,7 +4,7 @@ import { z } from 'zod';
  * Schema for parsed paper data extracted by LLM
  */
 export const ParsedPaperSchema = z.object({
-  title: z.string().optional(),
+  title: z.string().optional().nullable(),
   biomarkers: z.array(z.string()).default([]).describe('Biomarkers discussed in the study (e.g., LDL, HbA1c, eGFR)'),
   inclusionCriteria: z.string().optional().nullable().describe('Study inclusion criteria as a human-readable string'),
   exclusionCriteria: z.string().optional().nullable().describe('Study exclusion criteria, or null if not specified'),
