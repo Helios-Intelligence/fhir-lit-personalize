@@ -19,6 +19,12 @@ Return your response as a JSON object with the following structure:
       "baselineValue": 92,
       "achievedValue": 30,
       "unit": "mg/dL"
+    },
+    "HbA1c": {
+      "absoluteChange": -0.4,
+      "baselineValue": 8.7,
+      "achievedValue": 8.3,
+      "unit": "%"
     }
   },
   "inclusionCriteria": "Human-readable summary of who was eligible for the study",
@@ -59,9 +65,13 @@ Return your response as a JSON object with the following structure:
 - The first biomarker should be the PRIMARY outcome measure
 
 ## Biomarker Effects
-- Extract the percentage change for key biomarkers (LDL, HbA1c, etc.)
+- Extract the change for key biomarkers (LDL, HbA1c, blood pressure, etc.)
 - Include baseline and achieved values when available
-- percentReduction should be a decimal (0.59 for 59% reduction)
+- For PERCENTAGE changes (like LDL): use percentReduction as decimal (0.59 for 59% reduction)
+- For ABSOLUTE changes (like HbA1c, blood pressure): use absoluteChange instead
+  Example for HbA1c: { "absoluteChange": -0.4, "baselineValue": 8.7, "achievedValue": 8.3, "unit": "%" }
+  Example for systolic BP: { "absoluteChange": -15, "baselineValue": 140, "achievedValue": 125, "unit": "mmHg" }
+- ALWAYS extract biomarker effects even if modest - they help personalize the output
 
 ## Intervention Dosing
 - Include EXACT dosing regimen (dose amount, frequency, route)

@@ -5,10 +5,11 @@ import { z } from 'zod';
  */
 // Schema for biomarker effect data
 const BiomarkerEffectSchema = z.object({
-  percentReduction: z.number().optional().nullable().describe('Percentage reduction as decimal (0.59 = 59%)'),
+  percentReduction: z.number().optional().nullable().describe('Percentage reduction as decimal (0.59 = 59%) - use for relative changes like LDL'),
+  absoluteChange: z.number().optional().nullable().describe('Absolute change (e.g., -0.4 for HbA1c, -15 for BP) - use for absolute changes'),
   baselineValue: z.number().optional().nullable().describe('Baseline value in the study'),
   achievedValue: z.number().optional().nullable().describe('Achieved value after treatment'),
-  unit: z.string().optional().nullable().describe('Unit of measurement (e.g., mg/dL)'),
+  unit: z.string().optional().nullable().describe('Unit of measurement (e.g., mg/dL, %, mmHg)'),
 });
 
 export const ParsedPaperSchema = z.object({

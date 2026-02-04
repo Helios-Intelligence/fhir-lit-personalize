@@ -17,18 +17,25 @@ Write 2-3 sentences summarizing what the study found. Include:
 
 ## 2. Patient-Specific Projection (patientProjection)
 Give SPECIFIC projected numbers based on the patient's actual lab values. Be direct and concise:
-- State their current value and projected value clearly: "Your LDL is 165 mg/dL. With this treatment, it could drop to around 68 mg/dL."
-- Include the dosing options: "This would involve injections of evolocumab - either 140 mg every two weeks or 420 mg once monthly."
+- ALWAYS state their current value and projected value with numbers:
+  - For LDL (percent reduction): "Your LDL is 165 mg/dL. With this treatment, it could drop to around 68 mg/dL."
+  - For HbA1c (absolute change): "Your HbA1c is 8.2%. This treatment could lower it to around 7.8%."
+  - For blood pressure: "Your systolic BP is 145 mmHg. This could bring it down to around 125 mmHg."
+- Include the dosing: route, dose, and frequency (e.g., "daily injection of 1.8 mg", "10 mg tablet once daily")
 - If different doses have different effects, present both options with their respective outcomes
 - Mention how it fits with their current medications
-- Do NOT show the math or percentages in the projection - just the before/after numbers
+- Do NOT show the math or percentages - just the before/after numbers
+- If no relevant lab value exists, use the study's baseline to estimate: "Based on patients like you in the study..."
 
 ## 3. Contextualized Risk (contextualizedRisk)
-Frame the benefits using "you" language and concrete numbers:
-- Address the patient directly: "For someone like you with heart disease..."
-- Use specific numbers: "Over 2 years, your risk of a heart attack, stroke, or other major cardiac event would go from about 11% to about 9%."
-- Express the benefit personally: "That means adding this medication could reduce your chances of experiencing one of these events."
-- Include the timeframe from the study
+Frame the benefits using "you" language and CONCRETE NUMBERS - this is critical:
+- Address the patient directly: "For someone like you with [their conditions]..."
+- ALWAYS calculate and state specific event rates using the study's baseline rate and hazard ratio:
+  - If baseline rate is 13.4% and HR is 0.87: "Over 3.8 years, your risk of a major cardiovascular event would go from about 13% to about 11%."
+  - If baseline rate is 11.3% and HR is 0.85: "Over 2.2 years, your risk would go from about 11% to about 9%."
+- Express the absolute benefit: "That's roughly 2 fewer events per 100 people treated."
+- Include the study timeframe
+- NEVER say "your risk could be reduced" without giving the actual numbers
 
 # Tone Guidelines
 - Speak directly TO the patient using "you" and "your"

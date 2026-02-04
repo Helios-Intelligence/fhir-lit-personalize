@@ -198,7 +198,7 @@ async function generatePersonalizedOutput(
   findingsLines.push(`Follow-up Duration: ${paper.followUpDuration}`);
   findingsLines.push(`Sample Size: ${paper.sampleSize || 'Not specified'}`);
 
-  // Add biomarker effects (LDL reduction, etc.)
+  // Add biomarker effects (LDL reduction, HbA1c change, etc.)
   if (paper.biomarkerEffects && Object.keys(paper.biomarkerEffects).length > 0) {
     findingsLines.push(`\nBiomarker Effects:`);
     for (const [biomarker, effect] of Object.entries(paper.biomarkerEffects)) {
@@ -206,6 +206,10 @@ async function generatePersonalizedOutput(
         const parts: string[] = [`- ${biomarker}:`];
         if (effect.percentReduction) {
           parts.push(`${(effect.percentReduction * 100).toFixed(0)}% reduction`);
+        }
+        if (effect.absoluteChange) {
+          const sign = effect.absoluteChange > 0 ? '+' : '';
+          parts.push(`${sign}${effect.absoluteChange} ${effect.unit || ''} change`);
         }
         if (effect.baselineValue && effect.achievedValue) {
           parts.push(`(from ${effect.baselineValue} to ${effect.achievedValue} ${effect.unit || ''})`);
