@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       intervention: parsedPaper.intervention,
       primaryEndpoint: parsedPaper.primaryEndpoint,
       population: parsedPaper.inclusionCriteria,
-      followUp: parsedPaper.followUpDuration,
+      followUp: parsedPaper.followUpDuration ?? undefined,
     };
 
     // Step 3: Check applicability

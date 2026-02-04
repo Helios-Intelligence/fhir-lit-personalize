@@ -63,7 +63,7 @@ export interface PaperSummary {
   intervention: string;
   primaryEndpoint: string;
   population: string;
-  followUp: string;
+  followUp?: string;
 }
 
 /**
