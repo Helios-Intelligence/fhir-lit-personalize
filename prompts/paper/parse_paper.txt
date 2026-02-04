@@ -51,6 +51,13 @@ Return your response as a JSON object with the following structure:
 
 # Important Notes for Extraction
 
+## Biomarkers Array - IMPORTANT ORDERING
+- List biomarkers in order of CLINICAL IMPORTANCE for the study
+- For lipid studies: ALWAYS put "LDL cholesterol" FIRST, then others (non-HDL, apoB, etc.)
+- For diabetes studies: ALWAYS put "HbA1c" FIRST
+- For kidney studies: ALWAYS put "eGFR" FIRST
+- The first biomarker should be the PRIMARY outcome measure
+
 ## Biomarker Effects
 - Extract the percentage change for key biomarkers (LDL, HbA1c, etc.)
 - Include baseline and achieved values when available

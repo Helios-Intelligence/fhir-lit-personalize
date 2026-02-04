@@ -100,16 +100,21 @@ function performRuleBasedChecks(
     }
   }
 
-  // Check if key biomarkers are available
-  for (const biomarker of paper.biomarkers.slice(0, 3)) { // Check first 3 biomarkers
-    const value = getBiomarkerValue(patient, biomarker);
-    if (!value) {
+  // Check if at least ONE key biomarker is available
+  // We only require the primary biomarker (first in list) OR any of the first 3
+  const biomarkersToCheck = paper.biomarkers.slice(0, 3);
+  if (biomarkersToCheck.length > 0) {
+    const availableBiomarkers = biomarkersToCheck.filter(b => getBiomarkerValue(patient, b));
+
+    if (availableBiomarkers.length === 0) {
+      // No biomarkers available - this is a problem
       reasons.push({
         type: 'biomarker',
-        description: `Missing biomarker data: ${biomarker}`,
-        details: `The study results are based on ${biomarker} levels, which are not in the patient's records`,
+        description: `Missing biomarker data: ${biomarkersToCheck[0]}`,
+        details: `The study results are based on ${biomarkersToCheck[0]} levels, which are not in the patient's records. Consider getting this lab test.`,
       });
     }
+    // Note: If at least one biomarker is available, we proceed (the LLM can work with what's available)
   }
 
   return {
