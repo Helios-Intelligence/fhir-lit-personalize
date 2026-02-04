@@ -39,3 +39,4 @@ next-env.d.ts
 
 # Task management
 /tasks/
+fhir/stephan.json

@@ -1,0 +1,722 @@
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:test-patient-cardiac-001",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "test-patient-cardiac-001",
+        "name": [{"family": "TestPatient", "given": ["Cardiac"]}],
+        "gender": "female",
+        "birthDate": "1960-05-22"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:obs-ldl-001",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-ldl-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2089-1",
+              "display": "Cholesterol in LDL [Mass/volume] in Serum or Plasma"
+            }
+          ],
+          "text": "LDL Cholesterol"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "effectiveDateTime": "2025-01-08T09:00:00Z",
+        "valueQuantity": {
+          "value": 165,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org"
+        },
+        "referenceRange": [
+          {
+            "high": {"value": 100, "unit": "mg/dL"}
+          }
+        ],
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "H",
+                "display": "High"
+              }
+            ],
+            "text": "High"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:obs-total-chol-001",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-total-chol-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2093-3",
+              "display": "Cholesterol [Mass/volume] in Serum or Plasma"
+            }
+          ],
+          "text": "Total Cholesterol"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "effectiveDateTime": "2025-01-08T09:00:00Z",
+        "valueQuantity": {
+          "value": 245,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org"
+        },
+        "referenceRange": [
+          {
+            "high": {"value": 200, "unit": "mg/dL"}
+          }
+        ],
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "H",
+                "display": "High"
+              }
+            ],
+            "text": "High"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:obs-triglycerides-001",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-triglycerides-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2571-8",
+              "display": "Triglyceride [Mass/volume] in Serum or Plasma"
+            }
+          ],
+          "text": "Triglycerides"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "effectiveDateTime": "2025-01-08T09:00:00Z",
+        "valueQuantity": {
+          "value": 210,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org"
+        },
+        "referenceRange": [
+          {
+            "high": {"value": 150, "unit": "mg/dL"}
+          }
+        ],
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "H",
+                "display": "High"
+              }
+            ],
+            "text": "High"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:obs-hdl-001",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-hdl-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2085-9",
+              "display": "Cholesterol in HDL [Mass/volume] in Serum or Plasma"
+            }
+          ],
+          "text": "HDL Cholesterol"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "effectiveDateTime": "2025-01-08T09:00:00Z",
+        "valueQuantity": {
+          "value": 38,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org"
+        },
+        "referenceRange": [
+          {
+            "low": {"value": 40, "unit": "mg/dL"}
+          }
+        ],
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "L",
+                "display": "Low"
+              }
+            ],
+            "text": "Low"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:obs-bnp-001",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-bnp-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "30934-4",
+              "display": "Natriuretic peptide B [Mass/volume] in Serum or Plasma"
+            }
+          ],
+          "text": "BNP"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "effectiveDateTime": "2025-01-08T09:00:00Z",
+        "valueQuantity": {
+          "value": 450,
+          "unit": "pg/mL",
+          "system": "http://unitsofmeasure.org"
+        },
+        "referenceRange": [
+          {
+            "high": {"value": 100, "unit": "pg/mL"}
+          }
+        ],
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "H",
+                "display": "High"
+              }
+            ],
+            "text": "High"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cond-cad-001",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-cad-001",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ],
+          "text": "Active"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "53741008",
+              "display": "Coronary arteriosclerosis"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "I25.10",
+              "display": "Atherosclerotic heart disease of native coronary artery"
+            }
+          ],
+          "text": "Coronary Artery Disease"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "onsetDateTime": "2022-05-20"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cond-afib-001",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-afib-001",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ],
+          "text": "Active"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "49436004",
+              "display": "Atrial fibrillation"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "I48.91",
+              "display": "Unspecified atrial fibrillation"
+            }
+          ],
+          "text": "Atrial Fibrillation"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "onsetDateTime": "2023-02-14"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cond-hfpef-001",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-hfpef-001",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ],
+          "text": "Active"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "788950000",
+              "display": "Heart failure with preserved ejection fraction"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "I50.32",
+              "display": "Chronic diastolic (congestive) heart failure"
+            }
+          ],
+          "text": "Heart Failure with Preserved Ejection Fraction"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "onsetDateTime": "2023-08-01"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cond-htn-002",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-htn-002",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ],
+          "text": "Active"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "59621000",
+              "display": "Essential hypertension"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "I10",
+              "display": "Essential (primary) hypertension"
+            }
+          ],
+          "text": "Hypertension"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "onsetDateTime": "2015-03-10"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:medstmt-metoprolol-001",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstmt-metoprolol-001",
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "866924",
+              "display": "Metoprolol Succinate 50 MG Extended Release Oral Tablet"
+            }
+          ],
+          "text": "Metoprolol Succinate 50mg"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "dosage": [
+          {
+            "text": "50mg once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 50,
+                  "unit": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:medstmt-apixaban-001",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstmt-apixaban-001",
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "1364430",
+              "display": "Apixaban 5 MG Oral Tablet"
+            }
+          ],
+          "text": "Apixaban 5mg"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "dosage": [
+          {
+            "text": "5mg twice daily",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 5,
+                  "unit": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:medstmt-rosuvastatin-001",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstmt-rosuvastatin-001",
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "859749",
+              "display": "Rosuvastatin 20 MG Oral Tablet"
+            }
+          ],
+          "text": "Rosuvastatin 20mg"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "dosage": [
+          {
+            "text": "20mg once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 20,
+                  "unit": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:medstmt-furosemide-001",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstmt-furosemide-001",
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "197730",
+              "display": "Furosemide 40 MG Oral Tablet"
+            }
+          ],
+          "text": "Furosemide 40mg"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "dosage": [
+          {
+            "text": "40mg once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 40,
+                  "unit": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:medstmt-lisinopril-002",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstmt-lisinopril-002",
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "314077",
+              "display": "Lisinopril 20 MG Oral Tablet"
+            }
+          ],
+          "text": "Lisinopril 20mg"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "dosage": [
+          {
+            "text": "20mg once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "value": 20,
+                  "unit": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:fmh-father-002",
+      "resource": {
+        "resourceType": "FamilyMemberHistory",
+        "id": "fmh-father-002",
+        "status": "completed",
+        "patient": {"reference": "Patient/test-patient-cardiac-001"},
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+              "code": "FTH",
+              "display": "Father"
+            }
+          ],
+          "text": "Father"
+        },
+        "condition": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "22298006",
+                  "display": "Myocardial infarction"
+                }
+              ],
+              "text": "Myocardial Infarction"
+            },
+            "onsetAge": {
+              "value": 58,
+              "unit": "years",
+              "system": "http://unitsofmeasure.org",
+              "code": "a"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:fmh-sister-001",
+      "resource": {
+        "resourceType": "FamilyMemberHistory",
+        "id": "fmh-sister-001",
+        "status": "completed",
+        "patient": {"reference": "Patient/test-patient-cardiac-001"},
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+              "code": "SIS",
+              "display": "Sister"
+            }
+          ],
+          "text": "Sister"
+        },
+        "condition": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "230690007",
+                  "display": "Cerebrovascular accident"
+                }
+              ],
+              "text": "Stroke"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:diag-echo-001",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "diag-echo-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "CUS",
+                "display": "Cardiac Ultrasound"
+              }
+            ],
+            "text": "Cardiac Ultrasound"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "34552-0",
+              "display": "Cardiac echo study"
+            }
+          ],
+          "text": "Echocardiogram"
+        },
+        "subject": {"reference": "Patient/test-patient-cardiac-001"},
+        "effectiveDateTime": "2024-11-15T14:30:00Z",
+        "conclusion": "EF 55%, mild diastolic dysfunction, mild mitral regurgitation"
+      }
+    }
+  ]
+}
