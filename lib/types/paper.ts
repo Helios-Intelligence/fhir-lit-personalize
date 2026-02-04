@@ -3,9 +3,18 @@ import { z } from 'zod';
 /**
  * Schema for parsed paper data extracted by LLM
  */
+// Schema for biomarker effect data
+const BiomarkerEffectSchema = z.object({
+  percentReduction: z.number().optional().nullable().describe('Percentage reduction as decimal (0.59 = 59%)'),
+  baselineValue: z.number().optional().nullable().describe('Baseline value in the study'),
+  achievedValue: z.number().optional().nullable().describe('Achieved value after treatment'),
+  unit: z.string().optional().nullable().describe('Unit of measurement (e.g., mg/dL)'),
+});
+
 export const ParsedPaperSchema = z.object({
   title: z.string().optional().nullable(),
   biomarkers: z.array(z.string()).default([]).describe('Biomarkers discussed in the study (e.g., LDL, HbA1c, eGFR)'),
+  biomarkerEffects: z.record(z.string(), BiomarkerEffectSchema).optional().nullable().describe('Effect on biomarkers with percentage reduction'),
   inclusionCriteria: z.string().optional().nullable().describe('Study inclusion criteria as a human-readable string'),
   exclusionCriteria: z.string().optional().nullable().describe('Study exclusion criteria, or null if not specified'),
   populationDemographics: z.object({

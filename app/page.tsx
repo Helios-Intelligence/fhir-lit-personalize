@@ -277,6 +277,23 @@ export default function Home() {
                       </span>
                     </p>
                   )}
+                  {parsedPaper.biomarkerEffects && Object.entries(parsedPaper.biomarkerEffects).map(([biomarker, effect]) => (
+                    effect?.percentReduction && (
+                      <p key={biomarker}>
+                        <span className="font-medium text-gray-700">
+                          {biomarker} Reduction:
+                        </span>{" "}
+                        <span className="text-gray-600">
+                          {(effect.percentReduction * 100).toFixed(0)}%
+                          {effect.baselineValue && effect.achievedValue && (
+                            <span className="text-gray-400 ml-1">
+                              ({effect.baselineValue} → {effect.achievedValue} {effect.unit || ''})
+                            </span>
+                          )}
+                        </span>
+                      </p>
+                    )
+                  ))}
                   {parsedPaper.keyFindings.hazardRatio && (
                     <p>
                       <span className="font-medium text-gray-700">

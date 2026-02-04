@@ -12,17 +12,25 @@ Return your response as a JSON object with the following structure:
 
 {
   "title": "The title of the paper if identifiable",
-  "biomarkers": ["Array of biomarkers discussed, e.g., 'LDL-C', 'HbA1c', 'eGFR'"],
+  "biomarkers": ["Array of biomarkers discussed, e.g., 'LDL cholesterol', 'HbA1c', 'eGFR'"],
+  "biomarkerEffects": {
+    "LDL cholesterol": {
+      "percentReduction": 0.59,
+      "baselineValue": 92,
+      "achievedValue": 30,
+      "unit": "mg/dL"
+    }
+  },
   "inclusionCriteria": "Human-readable summary of who was eligible for the study",
   "exclusionCriteria": "Human-readable summary of exclusion criteria, or null if not specified",
   "populationDemographics": {
     "ageRange": "Age range as string, e.g., '40-75 years'",
     "minAge": 40,
     "maxAge": 75,
-    "requiredConditions": ["List of conditions required for enrollment, e.g., 'cardiovascular disease', 'prior MI'"],
+    "requiredConditions": ["List of conditions required for enrollment, e.g., 'atherosclerotic cardiovascular disease', 'prior MI'"],
     "requiredMedications": ["List of medications required, e.g., 'statin therapy'"]
   },
-  "intervention": "The treatment or intervention being studied",
+  "intervention": "The treatment or intervention being studied WITH DOSING, e.g., 'evolocumab 140 mg subcutaneously every 2 weeks or 420 mg monthly'",
   "comparator": "The control/comparator group",
   "primaryEndpoint": "The primary endpoint of the study",
   "secondaryEndpoints": ["List of secondary endpoints if mentioned"],
@@ -40,12 +48,26 @@ Return your response as a JSON object with the following structure:
   "studyDesign": "Type of study, e.g., 'randomized controlled trial'"
 }
 
-# Important Notes
-- For effect sizes, use decimals (0.15 for 15% reduction)
-- If a value is not mentioned in the paper, omit that field
-- For conditions and medications, use common clinical terminology
-- Include SNOMED or ICD codes if mentioned, otherwise use descriptive names
+# Important Notes for Extraction
+
+## Biomarker Effects
+- Extract the percentage change for key biomarkers (LDL, HbA1c, etc.)
+- Include baseline and achieved values when available
+- percentReduction should be a decimal (0.59 for 59% reduction)
+
+## Intervention Dosing
+- Include EXACT dosing regimen (dose amount, frequency, route)
+- Example: "evolocumab 140 mg subcutaneously every 2 weeks or 420 mg monthly"
+- Example: "empagliflozin 10 mg or 25 mg orally once daily"
+
+## Effect Sizes
+- Use decimals (0.15 for 15% reduction)
 - Hazard ratio < 1 indicates benefit for the intervention group
 - NNT (number needed to treat) should be a positive integer
+
+## General
+- If a value is not mentioned in the paper, omit that field
+- For conditions and medications, use common clinical terminology
+- Be specific about what conditions qualify (e.g., "atherosclerotic cardiovascular disease" not just "heart disease")
 
 Return only the JSON object, no additional text.

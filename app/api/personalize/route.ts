@@ -193,13 +193,30 @@ async function generatePersonalizedOutput(
   if (paper.title) {
     findingsLines.push(`Study: ${paper.title}`);
   }
-  findingsLines.push(`Intervention: ${paper.intervention}`);
+  findingsLines.push(`Intervention (with dosing): ${paper.intervention}`);
   findingsLines.push(`Primary Endpoint: ${paper.primaryEndpoint}`);
   findingsLines.push(`Follow-up Duration: ${paper.followUpDuration}`);
   findingsLines.push(`Sample Size: ${paper.sampleSize || 'Not specified'}`);
 
+  // Add biomarker effects (LDL reduction, etc.)
+  if (paper.biomarkerEffects && Object.keys(paper.biomarkerEffects).length > 0) {
+    findingsLines.push(`\nBiomarker Effects:`);
+    for (const [biomarker, effect] of Object.entries(paper.biomarkerEffects)) {
+      if (effect) {
+        const parts: string[] = [`- ${biomarker}:`];
+        if (effect.percentReduction) {
+          parts.push(`${(effect.percentReduction * 100).toFixed(0)}% reduction`);
+        }
+        if (effect.baselineValue && effect.achievedValue) {
+          parts.push(`(from ${effect.baselineValue} to ${effect.achievedValue} ${effect.unit || ''})`);
+        }
+        findingsLines.push(parts.join(' '));
+      }
+    }
+  }
+
   if (paper.keyFindings.hazardRatio) {
-    findingsLines.push(`\nKey Findings:`);
+    findingsLines.push(`\nClinical Outcomes:`);
     findingsLines.push(`- Hazard Ratio: ${paper.keyFindings.hazardRatio}`);
     if (paper.keyFindings.hazardRatioCI) {
       findingsLines.push(`- 95% CI: ${paper.keyFindings.hazardRatioCI.lower} - ${paper.keyFindings.hazardRatioCI.upper}`);
