@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { IBundle } from '@ahryman40k/ts-fhir-types/lib/R4';
-import { extractPatientData, getBiomarkerValue } from '@/lib/fhir-extractor';
 import { checkApplicability } from '@/lib/applicability-checker';
 import { loadPromptWithVariables } from '@/lib/prompt-loader';
+import { getBiomarkerValue } from '@/lib/fhir-extractor';
 import type { ParsedPaper } from '@/lib/types/paper';
+import type { ExtractedPatient } from '@/lib/types/patient';
 import type { PipelineResult, PersonalizedResult, PatientSummary, PaperSummary } from '@/lib/types/result';
 
 export const runtime = 'nodejs';
@@ -12,20 +12,51 @@ export const maxDuration = 180;
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
+// Interface for serialized patient data (Map becomes array of entries)
+interface SerializedPatient {
+  age: number | null;
+  sex: 'male' | 'female' | 'other' | 'unknown';
+  birthDate?: string;
+  name?: string;
+  observations: Array<[string, any]>; // Serialized Map entries
+  conditions: Array<{
+    display: string;
+    snomedCode?: string;
+    icd10Code?: string;
+    clinicalStatus: string;
+    onsetDate?: string;
+  }>;
+  medications: Array<{
+    name: string;
+    status: string;
+    dosage?: string;
+    startDate?: string;
+    rxnormCode?: string;
+  }>;
+}
+
 interface PersonalizeRequest {
-  fhirBundle: IBundle;
+  extractedPatient: SerializedPatient;
   parsedPaper: ParsedPaper;
+}
+
+// Deserialize patient data (convert observations array back to Map)
+function deserializePatient(serialized: SerializedPatient): ExtractedPatient {
+  return {
+    ...serialized,
+    observations: new Map(serialized.observations),
+  };
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: PersonalizeRequest = await request.json();
-    const { fhirBundle, parsedPaper } = body;
+    const { extractedPatient, parsedPaper } = body;
 
     // Validate inputs
-    if (!fhirBundle || !fhirBundle.entry) {
+    if (!extractedPatient) {
       return NextResponse.json(
-        { error: 'Invalid FHIR Bundle format' },
+        { error: 'Extracted patient data is required' },
         { status: 400 }
       );
     }
@@ -37,8 +68,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Extract patient data from FHIR bundle
-    const patient = extractPatientData(fhirBundle);
+    // Deserialize patient data (convert observations array back to Map)
+    const patient = deserializePatient(extractedPatient);
 
     // Create patient summary for response
     const patientSummary: PatientSummary = {
@@ -122,7 +153,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function generatePersonalizedOutput(
-  patient: ReturnType<typeof extractPatientData>,
+  patient: ExtractedPatient,
   paper: ParsedPaper,
   patientSummary: PatientSummary
 ): Promise<PersonalizedResult> {

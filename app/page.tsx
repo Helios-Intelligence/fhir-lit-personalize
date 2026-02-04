@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { PipelineStep, PipelineResult } from "@/lib/types/result";
 import type { ParsedPaper } from "@/lib/types/paper";
+import { extractPatientDataClient } from "@/lib/fhir-extractor-client";
 
 interface PaperMetadata {
   title?: string;
@@ -23,6 +24,7 @@ interface PaperMetadata {
 
 export default function Home() {
   const [fhirBundle, setFhirBundle] = useState<any>(null);
+  const [extractedPatient, setExtractedPatient] = useState<any>(null);
   const [paperText, setPaperText] = useState<string | null>(null);
   const [paperSource, setPaperSource] = useState<"pdf" | "pmid" | "doi" | null>(
     null
@@ -36,6 +38,15 @@ export default function Home() {
   const handleFhirAccepted = useCallback((bundle: any) => {
     setFhirBundle(bundle);
     setError(null);
+
+    // Extract patient data client-side immediately
+    try {
+      const extracted = extractPatientDataClient(bundle);
+      setExtractedPatient(extracted);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to extract patient data";
+      setError(msg);
+    }
   }, []);
 
   const handlePaperText = useCallback(
@@ -53,7 +64,7 @@ export default function Home() {
   }, []);
 
   const runPipeline = async () => {
-    if (!fhirBundle || !paperText) return;
+    if (!extractedPatient || !paperText) return;
 
     setError(null);
     setResult(null);
@@ -68,7 +79,7 @@ export default function Home() {
         body: JSON.stringify({
           paperText,
           source: paperSource,
-          metadata: paperMetadata, // Pass metadata to parser
+          metadata: paperMetadata,
         }),
       });
 
@@ -94,11 +105,12 @@ export default function Home() {
 
       setCurrentStep("checking-applicability");
 
+      // Send only extracted patient data (not the full FHIR bundle)
       const personalizeResponse = await fetch("/api/personalize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fhirBundle,
+          extractedPatient,
           parsedPaper: parsed,
         }),
       });
@@ -127,6 +139,7 @@ export default function Home() {
 
   const resetPipeline = () => {
     setFhirBundle(null);
+    setExtractedPatient(null);
     setPaperText(null);
     setPaperSource(null);
     setPaperMetadata(null);
@@ -136,7 +149,7 @@ export default function Home() {
     setError(null);
   };
 
-  const canRun = fhirBundle && paperText && currentStep === "idle";
+  const canRun = extractedPatient && paperText && currentStep === "idle";
   const isProcessing = !["idle", "complete", "error"].includes(currentStep);
 
   // Get display title from metadata or parsed paper
