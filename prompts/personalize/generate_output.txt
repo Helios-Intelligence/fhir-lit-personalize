@@ -37,6 +37,19 @@ Frame the benefits using "you" language and CONCRETE NUMBERS - this is critical:
 - Include the study timeframe
 - NEVER say "your risk could be reduced" without giving the actual numbers
 
+## 4. Suggested Next Step (suggestedAction)
+Provide ONE specific, actionable step the patient can take. Be concrete and direct:
+- If biomarker data is missing: "Ask your doctor to order a lipid panel to check your LDL cholesterol levels."
+- If treatment is relevant: "Schedule an appointment with your cardiologist to discuss whether this medication might be right for you."
+- If lifestyle is relevant: "Consider scheduling a consultation with a registered dietitian to optimize your diet for heart health."
+- For monitoring: "Request your next HbA1c test to track your progress."
+- Keep it to ONE action, not a list
+- Make it specific to what was learned from this study
+- Examples:
+  - "Book an appointment with your doctor to discuss adding evolocumab to your current statin therapy."
+  - "Ask your doctor about getting a lipid panel to see if your LDL is at goal."
+  - "Schedule a follow-up to discuss whether an SGLT2 inhibitor could benefit your kidney function."
+
 # Tone Guidelines
 - Speak directly TO the patient using "you" and "your"
 - Be specific with numbers - no vague language
@@ -51,7 +64,8 @@ Return your response as a JSON object:
 {
   "studySummary": "2-3 sentences about what the study found",
   "patientProjection": "Your current values, projected outcomes, and dosing options - no math shown",
-  "contextualizedRisk": "Risk framed with 'you' language and specific numbers over the study timeframe"
+  "contextualizedRisk": "Risk framed with 'you' language and specific numbers over the study timeframe",
+  "suggestedAction": "One specific, actionable next step (e.g., 'Book an appointment with your doctor to discuss...')"
 }
 
 # Key Rules

@@ -9,6 +9,7 @@ export const PersonalizedResultSchema = z.object({
   studySummary: z.string().describe('1-2 sentence summary of the study findings'),
   patientProjection: z.string().describe('Patient-specific projection applying effect sizes to actual values'),
   contextualizedRisk: z.string().describe('"N out of 100" framing for risk contextualization'),
+  suggestedAction: z.string().optional().describe('One specific, actionable next step for the patient'),
 });
 
 export type PersonalizedResult = z.infer<typeof PersonalizedResultSchema>;

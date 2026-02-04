@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Copy, Check, BookOpen, User, BarChart3 } from "lucide-react";
+import { Copy, Check, BookOpen, User, BarChart3, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { PersonalizedResult as PersonalizedResultType } from "@/lib/types/result";
@@ -32,19 +32,26 @@ export function PersonalizedResult({ result }: PersonalizedResultProps) {
       color: "blue",
     },
     {
-      key: "patientProjection",
-      title: "What This Means For You",
-      content: result.patientProjection,
-      icon: User,
-      color: "purple",
-    },
-    {
       key: "contextualizedRisk",
       title: "Putting The Numbers In Context",
       content: result.contextualizedRisk,
       icon: BarChart3,
       color: "green",
     },
+    {
+      key: "patientProjection",
+      title: "What This Means For You",
+      content: result.patientProjection,
+      icon: User,
+      color: "purple",
+    },
+    ...(result.suggestedAction ? [{
+      key: "suggestedAction",
+      title: "Suggested Next Step",
+      content: result.suggestedAction,
+      icon: ArrowRight,
+      color: "amber",
+    }] : []),
   ];
 
   const colorClasses = {
@@ -65,6 +72,12 @@ export function PersonalizedResult({ result }: PersonalizedResultProps) {
       border: "border-green-200",
       icon: "text-green-600",
       title: "text-green-900",
+    },
+    amber: {
+      bg: "bg-amber-50",
+      border: "border-amber-200",
+      icon: "text-amber-600",
+      title: "text-amber-900",
     },
   };
 
