@@ -1,0 +1,51 @@
+You are an expert at extracting structured clinical trial information from research papers.
+
+Analyze the following paper text and extract the key information needed for personalizing the findings to a patient.
+
+# Paper Text
+{PAPER_TEXT}
+
+# Instructions
+Extract the following information from the paper. Be precise and use the exact values from the paper when available.
+
+Return your response as a JSON object with the following structure:
+
+{
+  "title": "The title of the paper if identifiable",
+  "biomarkers": ["Array of biomarkers discussed, e.g., 'LDL-C', 'HbA1c', 'eGFR'"],
+  "inclusionCriteria": "Human-readable summary of who was eligible for the study",
+  "exclusionCriteria": "Human-readable summary of exclusion criteria, or null if not specified",
+  "populationDemographics": {
+    "ageRange": "Age range as string, e.g., '40-75 years'",
+    "minAge": 40,
+    "maxAge": 75,
+    "requiredConditions": ["List of conditions required for enrollment, e.g., 'cardiovascular disease', 'prior MI'"],
+    "requiredMedications": ["List of medications required, e.g., 'statin therapy'"]
+  },
+  "intervention": "The treatment or intervention being studied",
+  "comparator": "The control/comparator group",
+  "primaryEndpoint": "The primary endpoint of the study",
+  "secondaryEndpoints": ["List of secondary endpoints if mentioned"],
+  "keyFindings": {
+    "effectSizes": {"endpoint_name": effect_value_as_number},
+    "relativeRiskReduction": 0.15,
+    "absoluteRiskReduction": 0.02,
+    "hazardRatio": 0.85,
+    "hazardRatioCI": {"lower": 0.79, "upper": 0.92},
+    "nnt": 50
+  },
+  "followUpDuration": "Duration of follow-up, e.g., '2.2 years median'",
+  "baselineEventRate": 0.05,
+  "sampleSize": 27564,
+  "studyDesign": "Type of study, e.g., 'randomized controlled trial'"
+}
+
+# Important Notes
+- For effect sizes, use decimals (0.15 for 15% reduction)
+- If a value is not mentioned in the paper, omit that field
+- For conditions and medications, use common clinical terminology
+- Include SNOMED or ICD codes if mentioned, otherwise use descriptive names
+- Hazard ratio < 1 indicates benefit for the intervention group
+- NNT (number needed to treat) should be a positive integer
+
+Return only the JSON object, no additional text.
