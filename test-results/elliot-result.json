@@ -1,18 +1,49 @@
 {
   "success": true,
   "applicability": {
-    "isApplicable": true,
-    "reasons": []
-  },
-  "personalizedResult": {
-    "studySummary": "A recent study used a powerful computer model to predict the risk of cardiovascular disease and heart attacks based on health data from over 200,000 people. The model showed promise in identifying those at higher risk.",
-    "patientProjection": "This study focused on predicting cardiovascular disease. While it didn't test a specific treatment, it used data similar to yours to identify risk factors. Since you are a 42-year-old male, the model's findings might help your doctor better understand your individual risk profile based on factors considered in the study.",
-    "contextualizedRisk": "This study focused on prediction, not intervention. However, understanding your risk is the first step. If 100 people with a similar risk profile to yours were identified using this model, it could help doctors focus preventative efforts on those most likely to benefit. Since the study didn't involve a specific treatment, we can't say how many fewer heart events might occur over a specific time period."
+    "isApplicable": false,
+    "reasons": [
+      {
+        "type": "condition",
+        "description": "Patient does not have required condition: Premature coronary artery disease",
+        "details": "The study required patients to have Premature coronary artery disease"
+      },
+      {
+        "type": "biomarker",
+        "description": "Missing biomarker data: lipoprotein(a)",
+        "details": "The study results are based on lipoprotein(a) levels, which are not in the patient's records"
+      }
+    ]
   },
   "patientSummary": {
     "age": 42,
     "sex": "male",
-    "relevantBiomarkers": [],
+    "relevantBiomarkers": [
+      {
+        "name": "Cholesterol in HDL [Mass/volume] in Serum or Plasma",
+        "value": "55",
+        "unit": "mg/dL",
+        "date": "2023-03-07T16:18:17.000Z"
+      },
+      {
+        "name": "Cholesterol [Mass/volume] in Serum or Plasma",
+        "value": "182",
+        "unit": "mg/dL",
+        "date": "2023-03-07T16:18:17.000Z"
+      },
+      {
+        "name": "Cholesterol in LDL [Mass/volume] in Serum or Plasma by Direct assay",
+        "value": "110",
+        "unit": "mg/dL",
+        "date": "2023-03-07T16:18:17.000Z"
+      },
+      {
+        "name": "Triglyceride [Mass/volume] in Serum or Plasma",
+        "value": "85",
+        "unit": "mg/dL",
+        "date": "2023-03-07T16:18:17.000Z"
+      }
+    ],
     "relevantConditions": [],
     "relevantMedications": [
       "valACYclovir 500 MG Oral Tablet",
@@ -36,9 +67,9 @@
     ]
   },
   "paperSummary": {
-    "title": "Predicting cardiovascular diseases using imbalanced data: An XGBoost-based analysis of the 2022 BRFSS dataset",
-    "intervention": "XGBoost machine learning model",
-    "primaryEndpoint": "Predicting cardiovascular disease (CVD) and myocardial infarction (MI)",
-    "population": "Non-institutionalized civilian population of the United States aged 18 years and older"
+    "title": "Premature coronary artery disease in women: sex-specific risk factors, pathogenetic mechanisms and clinical implications",
+    "intervention": "Aggressive lipid control, metabolic risk reduction, and psychosocial support",
+    "primaryEndpoint": "Early detection and tailored treatment of female PCAD",
+    "population": "Women with premature coronary artery disease (PCAD), defined as onset ≤65 years"
   }
 }

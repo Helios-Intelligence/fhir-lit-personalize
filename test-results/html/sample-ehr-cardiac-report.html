@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalized Literature Report - sample-ehr-cardiac</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; color: #111; }
+    h2 { font-size: 18px; margin: 24px 0 12px; color: #333; border-bottom: 2px solid #e5e5e5; padding-bottom: 8px; }
+    h3 { font-size: 16px; margin: 16px 0 8px; color: #444; }
+    p { margin-bottom: 12px; }
+    .header { margin-bottom: 32px; }
+    .subtitle { color: #666; font-size: 14px; }
+    .section { margin-bottom: 24px; }
+    .card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 4px solid #4a90d9;
+    }
+    .card.warning { border-left-color: #f0ad4e; background: #fff9e6; }
+    .card.success { border-left-color: #5cb85c; background: #f0fff0; }
+    .card.info { border-left-color: #5bc0de; background: #f0f9ff; }
+    .card-title { font-weight: 600; margin-bottom: 8px; color: #333; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin: 2px;
+    }
+    .badge-condition { background: #e8d5f0; color: #6b3d7d; }
+    .badge-medication { background: #d5f0e8; color: #2d6b4f; }
+    .badge-biomarker { background: #d5e8f0; color: #2d4f6b; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .stat { text-align: center; padding: 12px; background: #fff; border-radius: 6px; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #333; }
+    .stat-label { font-size: 12px; color: #666; text-transform: uppercase; }
+    .reason-item {
+      padding: 12px;
+      background: #fff;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border: 1px solid #e5e5e5;
+    }
+    .reason-type {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e5e5;
+      font-size: 12px;
+      color: #666;
+    }
+    @media print {
+      body { padding: 20px; }
+      .card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Personalized Literature Report</h1>
+    <p class="subtitle">Generated 2/4/2026</p>
+  </div>
+
+  <div class="section">
+    <h2>Patient Summary</h2>
+    <div class="grid">
+      <div class="stat">
+        <div class="stat-value">65</div>
+        <div class="stat-label">Age</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">Female</div>
+        <div class="stat-label">Sex</div>
+      </div>
+    </div>
+
+    
+    <h3>Conditions</h3>
+    <div>
+      <span class="badge badge-condition">Coronary Artery Disease</span> <span class="badge badge-condition">Atrial Fibrillation</span> <span class="badge badge-condition">Heart Failure with Preserved Ejection Fraction</span> <span class="badge badge-condition">Hypertension</span>
+    </div>
+    
+
+    
+    <h3>Medications</h3>
+    <div>
+      <span class="badge badge-medication">Metoprolol Succinate 50mg</span> <span class="badge badge-medication">Apixaban 5mg</span> <span class="badge badge-medication">Rosuvastatin 20mg</span> <span class="badge badge-medication">Furosemide 40mg</span> <span class="badge badge-medication">Lisinopril 20mg</span>
+      
+    </div>
+    
+
+    
+    <h3>Relevant Lab Values</h3>
+    <div>
+      <span class="badge badge-biomarker">HDL Cholesterol: 38 mg/dL</span> <span class="badge badge-biomarker">Total Cholesterol: 245 mg/dL</span> <span class="badge badge-biomarker">Triglycerides: 210 mg/dL</span>
+    </div>
+    
+  </div>
+
+  <div class="section">
+    <h2>Study Information</h2>
+    <div class="card info">
+      <div class="card-title">Premature coronary artery disease in women: sex-specific risk factors, pathogenetic mechanisms and clinical implications</div>
+      <p><strong>Intervention:</strong> Aggressive lipid control, metabolic risk reduction, and psychosocial support</p>
+      <p><strong>Primary Endpoint:</strong> Early detection and tailored treatment of female PCAD</p>
+      
+    </div>
+  </div>
+
+  
+  <div class="section">
+    <h2>Applicability Assessment</h2>
+    <div class="card warning">
+      <div class="card-title">This study may not directly apply to this patient</div>
+      <p>Based on the patient's health records, the findings from this study might not be directly applicable.</p>
+    </div>
+
+    
+    <h3>Reasons</h3>
+    
+    <div class="reason-item">
+      <div class="reason-type">condition</div>
+      <p><strong>Patient does not have required condition: Premature coronary artery disease</strong></p>
+      <p style="color: #666; font-size: 14px;">The study required patients to have Premature coronary artery disease</p>
+    </div>
+    
+    <div class="reason-item">
+      <div class="reason-type">biomarker</div>
+      <p><strong>Missing biomarker data: lipoprotein(a)</strong></p>
+      <p style="color: #666; font-size: 14px;">The study results are based on lipoprotein(a) levels, which are not in the patient's records</p>
+    </div>
+    
+    
+  </div>
+  
+
+  <div class="footer">
+    <p><strong>Important:</strong> This personalized summary is based on a research study and health data.
+    It is not medical advice. Always discuss treatment decisions with your healthcare provider.
+    Individual results may vary from study findings.</p>
+    <p style="margin-top: 12px;">Generated by FHIR Literature Personalization Tool</p>
+  </div>
+</body>
+</html>

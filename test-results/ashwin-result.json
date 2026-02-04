@@ -1,13 +1,29 @@
 {
   "success": true,
   "applicability": {
-    "isApplicable": true,
-    "reasons": []
-  },
-  "personalizedResult": {
-    "studySummary": "A recent study used a powerful computer model to predict the risk of cardiovascular disease and heart attacks based on a large health dataset. The model was able to identify patterns that could help doctors better understand who is at higher risk.",
-    "patientProjection": "This study didn't directly test a treatment or intervention, but it used data from over 200,000 people to build a model for predicting heart issues. Since you are currently taking atorvastatin, which helps lower cholesterol, this model could potentially help your doctor assess if there are other factors that might increase your risk, even with medication.",
-    "contextualizedRisk": "Because this study focused on prediction rather than treatment, it's hard to say exactly how it applies to you. However, the model could help doctors identify, for example, that among 100 people like you, perhaps 5 more might be at risk for a heart attack over the next few years than previously thought, prompting closer monitoring and preventative measures."
+    "isApplicable": false,
+    "reasons": [
+      {
+        "type": "condition",
+        "description": "Patient does not have required condition: Premature coronary artery disease",
+        "details": "The study required patients to have Premature coronary artery disease"
+      },
+      {
+        "type": "biomarker",
+        "description": "Missing biomarker data: HDL-C",
+        "details": "The study results are based on HDL-C levels, which are not in the patient's records"
+      },
+      {
+        "type": "biomarker",
+        "description": "Missing biomarker data: total cholesterol",
+        "details": "The study results are based on total cholesterol levels, which are not in the patient's records"
+      },
+      {
+        "type": "biomarker",
+        "description": "Missing biomarker data: lipoprotein(a)",
+        "details": "The study results are based on lipoprotein(a) levels, which are not in the patient's records"
+      }
+    ]
   },
   "patientSummary": {
     "age": 34,
@@ -29,9 +45,9 @@
     ]
   },
   "paperSummary": {
-    "title": "Predicting cardiovascular diseases using imbalanced data: An XGBoost-based analysis of the 2022 BRFSS dataset",
-    "intervention": "XGBoost machine learning model",
-    "primaryEndpoint": "Predicting cardiovascular disease (CVD) and myocardial infarction (MI)",
-    "population": "Non-institutionalized civilian population of the United States aged 18 years and older"
+    "title": "Premature coronary artery disease in women: sex-specific risk factors, pathogenetic mechanisms and clinical implications",
+    "intervention": "Aggressive lipid control, metabolic risk reduction, and psychosocial support",
+    "primaryEndpoint": "Early detection and tailored treatment of female PCAD",
+    "population": "Women with premature coronary artery disease (PCAD), defined as onset ≤65 years"
   }
 }
