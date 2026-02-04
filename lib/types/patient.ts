@@ -11,23 +11,25 @@ export interface ObservationValue {
 }
 
 /**
- * Patient condition with SNOMED coding
+ * Patient condition with SNOMED and ICD-10 coding
  */
 export interface PatientCondition {
   display: string;
   snomedCode?: string;
+  icd10Code?: string;
   clinicalStatus: string;
   onsetDate?: string;
 }
 
 /**
- * Patient medication
+ * Patient medication with RxNorm coding
  */
 export interface PatientMedication {
   name: string;
   status: string;
   dosage?: string;
   startDate?: string;
+  rxnormCode?: string;
 }
 
 /**

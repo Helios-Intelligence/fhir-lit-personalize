@@ -125,19 +125,23 @@ export function extractPatientData(bundle: IBundle): ExtractedPatient {
     });
   }
 
-  // Extract conditions
+  // Extract conditions with all available codes
   const extractedConditions: PatientCondition[] = conditions
     .filter(cond => {
       // Include active conditions or resolved conditions that may be relevant history
       const clinicalStatus = cond.clinicalStatus?.coding?.[0]?.code;
       return clinicalStatus === 'active' || clinicalStatus === 'resolved' || clinicalStatus === 'recurrence';
     })
-    .map(cond => ({
-      display: cond.code?.text || cond.code?.coding?.[0]?.display || 'Unknown condition',
-      snomedCode: cond.code?.coding?.find(c => c.system?.includes('snomed'))?.code,
-      clinicalStatus: cond.clinicalStatus?.coding?.[0]?.code || 'unknown',
-      onsetDate: cond.onsetDateTime || cond.onsetPeriod?.start,
-    }));
+    .map(cond => {
+      const codings = cond.code?.coding || [];
+      return {
+        display: cond.code?.text || cond.code?.coding?.[0]?.display || 'Unknown condition',
+        snomedCode: codings.find(c => c.system?.includes('snomed'))?.code,
+        icd10Code: codings.find(c => c.system?.includes('icd-10') || c.system?.includes('icd10'))?.code,
+        clinicalStatus: cond.clinicalStatus?.coding?.[0]?.code || 'unknown',
+        onsetDate: cond.onsetDateTime || cond.onsetPeriod?.start,
+      };
+    });
 
   // Extract medications
   const extractedMedications: PatientMedication[] = [];
@@ -147,7 +151,7 @@ export function extractPatientData(bundle: IBundle): ExtractedPatient {
     const status = stmt.status || 'unknown';
     if (status !== 'active' && status !== 'intended' && status !== 'on-hold') continue;
 
-    const medicationName = getMedicationName(stmt.medicationCodeableConcept, stmt.medicationReference, medicationMap);
+    const { name: medicationName, rxnormCode } = getMedicationInfo(stmt.medicationCodeableConcept, stmt.medicationReference, medicationMap);
     const dosageInfo = stmt.dosage?.[0];
     const doseQuantity = dosageInfo?.doseAndRate?.[0]?.doseQuantity;
     const dosage = dosageInfo?.text || (doseQuantity ? `${doseQuantity.value} ${doseQuantity.unit || ''}`.trim() : undefined);
@@ -157,6 +161,7 @@ export function extractPatientData(bundle: IBundle): ExtractedPatient {
       status,
       dosage,
       startDate: stmt.effectivePeriod?.start || stmt.effectiveDateTime,
+      rxnormCode,
     });
   }
 
@@ -165,7 +170,7 @@ export function extractPatientData(bundle: IBundle): ExtractedPatient {
     const status = req.status || 'unknown';
     if (status !== 'active' && status !== 'on-hold') continue;
 
-    const medicationName = getMedicationName(req.medicationCodeableConcept, req.medicationReference, medicationMap);
+    const { name: medicationName, rxnormCode } = getMedicationInfo(req.medicationCodeableConcept, req.medicationReference, medicationMap);
     const dosageInfo = req.dosageInstruction?.[0];
     const doseQuantity = dosageInfo?.doseAndRate?.[0]?.doseQuantity;
     const dosage = dosageInfo?.text || (doseQuantity ? `${doseQuantity.value} ${doseQuantity.unit || ''}`.trim() : undefined);
@@ -175,6 +180,7 @@ export function extractPatientData(bundle: IBundle): ExtractedPatient {
       status,
       dosage,
       startDate: req.authoredOn,
+      rxnormCode,
     });
   }
 
@@ -215,17 +221,215 @@ export function getBiomarkerValue(patient: ExtractedPatient, biomarkerName: stri
 }
 
 /**
- * Check if patient has a specific condition by SNOMED code or name
+ * SNOMED CT and ICD-10 codes for condition classes
+ * These are authoritative clinical codes for matching
+ */
+const CONDITION_CODES: Record<string, { snomed: string[], icd10: string[], terms: string[] }> = {
+  'atherosclerotic cardiovascular disease': {
+    snomed: [
+      '53741008',   // Coronary artery disease
+      '414545008',  // Ischemic heart disease
+      '22298006',   // Myocardial infarction
+      '230690007',  // Stroke / CVA
+      '266257000',  // TIA
+      '399211009',  // History of MI
+      '399261000',  // History of CVA
+      '400047006',  // Peripheral vascular disease
+      '64156001',   // Thrombophlebitis
+      '233970002',  // Coronary artery bypass graft
+      '428752002',  // History of CABG
+      '429559004',  // History of PCI
+      '413838009',  // Chronic ischemic heart disease
+      '194828000',  // Angina
+      '25106000',   // Acute coronary syndrome
+    ],
+    icd10: [
+      'I25', 'I25.1', 'I25.10', 'I25.11', 'I25.110', 'I25.111', 'I25.118', 'I25.119', // Chronic ischemic heart disease
+      'I21', 'I21.0', 'I21.1', 'I21.2', 'I21.3', 'I21.4', 'I21.9', // Acute MI
+      'I22', // Subsequent MI
+      'I63', 'I63.0', 'I63.1', 'I63.2', 'I63.3', 'I63.4', 'I63.5', 'I63.9', // Cerebral infarction
+      'I65', 'I66', // Carotid/cerebral artery occlusion
+      'I70', 'I70.2', 'I70.20', 'I70.21', 'I70.22', 'I70.23', 'I70.24', 'I70.25', // Atherosclerosis
+      'I73', 'I73.9', // Peripheral vascular disease
+      'Z95.1', // Presence of CABG
+      'Z95.5', // Presence of coronary stent
+      'Z86.73', // History of TIA
+      'Z86.74', // History of sudden cardiac arrest
+    ],
+    terms: [
+      'coronary artery disease', 'cad', 'coronary heart disease', 'chd',
+      'myocardial infarction', 'mi', 'heart attack',
+      'stroke', 'cerebrovascular accident', 'cva', 'tia', 'transient ischemic attack',
+      'peripheral artery disease', 'pad', 'peripheral vascular disease', 'pvd',
+      'carotid stenosis', 'carotid artery disease',
+      'ascvd', 'ischemic heart disease', 'angina', 'acute coronary syndrome',
+      'stemi', 'nstemi', 'unstable angina', 'cabg', 'bypass', 'stent', 'pci',
+    ],
+  },
+  'cardiovascular disease': {
+    snomed: [
+      '53741008',   // CAD
+      '84114007',   // Heart failure
+      '49436004',   // Atrial fibrillation
+      '22298006',   // MI
+      '230690007',  // Stroke
+    ],
+    icd10: ['I25', 'I50', 'I48', 'I21', 'I63'],
+    terms: ['coronary artery disease', 'heart disease', 'heart failure', 'atrial fibrillation', 'myocardial infarction', 'stroke'],
+  },
+  'diabetes': {
+    snomed: [
+      '44054006',   // Type 2 diabetes
+      '46635009',   // Type 1 diabetes
+      '73211009',   // Diabetes mellitus
+    ],
+    icd10: ['E10', 'E11', 'E13'],
+    terms: ['diabetes mellitus', 'type 2 diabetes', 'type 1 diabetes', 't2dm', 't1dm', 'diabetic'],
+  },
+  'hypertension': {
+    snomed: ['38341003', '59621000'],
+    icd10: ['I10', 'I11', 'I12', 'I13', 'I15'],
+    terms: ['hypertension', 'high blood pressure', 'htn', 'essential hypertension'],
+  },
+  'heart failure': {
+    snomed: [
+      '84114007',   // Heart failure
+      '441481004',  // Chronic systolic heart failure
+      '443253003',  // Acute on chronic systolic heart failure
+      '446221000',  // Heart failure with preserved ejection fraction
+    ],
+    icd10: ['I50', 'I50.1', 'I50.2', 'I50.3', 'I50.4', 'I50.9'],
+    terms: ['heart failure', 'hf', 'chf', 'congestive heart failure', 'hfref', 'hfpef'],
+  },
+};
+
+/**
+ * RxNorm codes and names for medication classes
+ */
+const MEDICATION_CODES: Record<string, { rxnorm: string[], terms: string[] }> = {
+  'statin': {
+    rxnorm: [
+      '83367',   // Atorvastatin
+      '301542',  // Rosuvastatin
+      '36567',   // Simvastatin
+      '42463',   // Pravastatin
+      '6472',    // Lovastatin
+      '41127',   // Fluvastatin
+      '861634',  // Pitavastatin
+    ],
+    terms: [
+      'atorvastatin', 'rosuvastatin', 'simvastatin', 'pravastatin',
+      'lovastatin', 'fluvastatin', 'pitavastatin',
+      'lipitor', 'crestor', 'zocor', 'pravachol', 'mevacor', 'lescol', 'livalo',
+      'statin',
+    ],
+  },
+  'statin therapy': {
+    rxnorm: ['83367', '301542', '36567', '42463', '6472', '41127', '861634'],
+    terms: [
+      'atorvastatin', 'rosuvastatin', 'simvastatin', 'pravastatin',
+      'lovastatin', 'fluvastatin', 'pitavastatin',
+      'lipitor', 'crestor', 'zocor', 'pravachol', 'mevacor', 'lescol', 'livalo',
+      'statin',
+    ],
+  },
+  'ace inhibitor': {
+    rxnorm: ['29046', '3827', '35296', '18867', '1998', '50166', '35208', '54552', '38454'],
+    terms: [
+      'lisinopril', 'enalapril', 'ramipril', 'benazepril', 'captopril',
+      'fosinopril', 'quinapril', 'perindopril', 'trandolapril',
+      'prinivil', 'zestril', 'vasotec', 'altace', 'lotensin', 'capoten',
+    ],
+  },
+  'arb': {
+    rxnorm: ['52175', '69749', '83515', '321064', '73494', '83818', '1091643'],
+    terms: [
+      'losartan', 'valsartan', 'irbesartan', 'olmesartan', 'telmisartan',
+      'candesartan', 'azilsartan',
+      'cozaar', 'diovan', 'avapro', 'benicar', 'micardis', 'atacand',
+    ],
+  },
+  'beta blocker': {
+    rxnorm: ['6918', '20352', '19484', '1202', '8787', '31555', '6185', '7226'],
+    terms: [
+      'metoprolol', 'carvedilol', 'bisoprolol', 'atenolol', 'propranolol',
+      'nebivolol', 'labetalol', 'nadolol',
+      'lopressor', 'toprol', 'coreg', 'zebeta', 'tenormin', 'inderal', 'bystolic',
+    ],
+  },
+  'anticoagulant': {
+    rxnorm: ['11289', '1364430', '1232082', '1037045', '1599538'],
+    terms: [
+      'warfarin', 'apixaban', 'rivaroxaban', 'dabigatran', 'edoxaban',
+      'coumadin', 'eliquis', 'xarelto', 'pradaxa', 'savaysa',
+      'heparin', 'enoxaparin', 'lovenox',
+    ],
+  },
+  'antiplatelet': {
+    rxnorm: ['1191', '32968', '613391', '1116632'],
+    terms: ['aspirin', 'clopidogrel', 'prasugrel', 'ticagrelor', 'plavix', 'effient', 'brilinta'],
+  },
+  'sglt2 inhibitor': {
+    rxnorm: ['1545653', '1488564', '1373458', '1992684'],
+    terms: [
+      'empagliflozin', 'dapagliflozin', 'canagliflozin', 'ertugliflozin',
+      'jardiance', 'farxiga', 'invokana', 'steglatro', 'sglt2',
+    ],
+  },
+  'glp1 agonist': {
+    rxnorm: ['1991302', '475968', '1534763', '60548', '2395779'],
+    terms: [
+      'semaglutide', 'liraglutide', 'dulaglutide', 'exenatide', 'tirzepatide',
+      'ozempic', 'wegovy', 'victoza', 'trulicity', 'byetta', 'bydureon', 'mounjaro', 'glp-1', 'glp1',
+    ],
+  },
+  'metformin': {
+    rxnorm: ['6809'],
+    terms: ['metformin', 'glucophage', 'glumetza', 'fortamet', 'riomet'],
+  },
+  'insulin': {
+    rxnorm: ['5856'],
+    terms: [
+      'insulin', 'lantus', 'basaglar', 'toujeo', 'levemir', 'tresiba',
+      'novolog', 'humalog', 'apidra', 'fiasp', 'admelog', 'humulin', 'novolin',
+    ],
+  },
+};
+
+/**
+ * Check if patient has a specific condition
+ * Uses SNOMED, ICD-10 codes and semantic text matching
  */
 export function hasCondition(patient: ExtractedPatient, conditionIdentifier: string): boolean {
   const normalized = conditionIdentifier.toLowerCase().trim();
 
+  // Get condition class definition (codes + terms)
+  const conditionClass = CONDITION_CODES[normalized];
+  const snomedCodes = conditionClass?.snomed || [];
+  const icd10Codes = conditionClass?.icd10 || [];
+  const terms = conditionClass?.terms || [normalized];
+
   return patient.conditions.some(cond => {
     // Check SNOMED code match
-    if (cond.snomedCode === conditionIdentifier) return true;
+    if (cond.snomedCode) {
+      if (snomedCodes.includes(cond.snomedCode)) return true;
+      if (cond.snomedCode === conditionIdentifier) return true;
+    }
 
-    // Check display name match
-    if (cond.display.toLowerCase().includes(normalized)) return true;
+    // Check ICD-10 code match (with prefix matching for subcodes)
+    if (cond.icd10Code) {
+      for (const code of icd10Codes) {
+        if (cond.icd10Code === code || cond.icd10Code.startsWith(code)) return true;
+      }
+    }
+
+    // Check display name match against all terms
+    const condDisplay = cond.display.toLowerCase();
+    for (const term of terms) {
+      if (condDisplay.includes(term) || term.includes(condDisplay)) {
+        return true;
+      }
+    }
 
     return false;
   });
@@ -233,14 +437,36 @@ export function hasCondition(patient: ExtractedPatient, conditionIdentifier: str
 
 /**
  * Check if patient is on a specific medication
+ * Uses RxNorm codes and semantic text matching
  */
 export function hasMedication(patient: ExtractedPatient, medicationName: string): boolean {
   const normalized = medicationName.toLowerCase().trim();
 
-  return patient.medications.some(med =>
-    med.name.toLowerCase().includes(normalized) &&
-    (med.status === 'active' || med.status === 'intended' || med.status === 'on-hold')
-  );
+  // Get medication class definition (codes + terms)
+  const medClass = MEDICATION_CODES[normalized];
+  const rxnormCodes = medClass?.rxnorm || [];
+  const terms = medClass?.terms || [normalized];
+
+  return patient.medications.some(med => {
+    if (med.status !== 'active' && med.status !== 'intended' && med.status !== 'on-hold') {
+      return false;
+    }
+
+    // Check RxNorm code match
+    if (med.rxnormCode && rxnormCodes.includes(med.rxnormCode)) {
+      return true;
+    }
+
+    // Check name match against all terms (drug names, brand names)
+    const medName = med.name.toLowerCase();
+    for (const term of terms) {
+      if (medName.includes(term)) {
+        return true;
+      }
+    }
+
+    return false;
+  });
 }
 
 // Helper functions
@@ -262,17 +488,19 @@ function formatObservationValue(obs: IObservation): string {
   return 'N/A';
 }
 
-function getMedicationName(
+function getMedicationInfo(
   medicationCodeableConcept: any,
   medicationReference: any,
   medicationMap: Map<string, IMedication>
-): string {
-  // First try medicationCodeableConcept
-  if (medicationCodeableConcept?.text) {
-    return medicationCodeableConcept.text;
-  }
-  if (medicationCodeableConcept?.coding?.[0]?.display) {
-    return medicationCodeableConcept.coding[0].display;
+): { name: string; rxnormCode?: string } {
+  let name = 'Unknown medication';
+  let rxnormCode: string | undefined;
+
+  // Try medicationCodeableConcept first
+  if (medicationCodeableConcept) {
+    const codings = medicationCodeableConcept.coding || [];
+    name = medicationCodeableConcept.text || codings[0]?.display || name;
+    rxnormCode = codings.find((c: any) => c.system?.includes('rxnorm'))?.code;
   }
 
   // Try to resolve medicationReference
@@ -281,14 +509,13 @@ function getMedicationName(
     const medication = medicationMap.get(refId);
 
     if (medication) {
-      if (medication.code?.text) {
-        return medication.code.text;
-      }
-      if (medication.code?.coding?.[0]?.display) {
-        return medication.code.coding[0].display;
+      const codings = medication.code?.coding || [];
+      name = medication.code?.text || codings[0]?.display || name;
+      if (!rxnormCode) {
+        rxnormCode = codings.find((c: any) => c.system?.includes('rxnorm'))?.code;
       }
     }
   }
 
-  return 'Unknown medication';
+  return { name, rxnormCode };
 }
