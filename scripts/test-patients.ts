@@ -13,8 +13,12 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
-const VERCEL_URL = 'https://ehr-lit-personalze.vercel.app';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const VERCEL_URL = 'https://ehrlitpersonalze.vercel.app';
 const LOCAL_URL = 'http://localhost:3000';
 
 interface TestResult {
