@@ -263,5 +263,6 @@ async function generatePersonalizedOutput(
     studySummary: parsed.studySummary || 'Unable to generate summary',
     patientProjection: parsed.patientProjection || 'Unable to generate projection',
     contextualizedRisk: parsed.contextualizedRisk || 'Unable to generate risk context',
+    suggestedAction: parsed.suggestedAction || 'Discuss these findings with your healthcare provider.',
   };
 }

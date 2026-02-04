@@ -45,13 +45,13 @@ export function PersonalizedResult({ result }: PersonalizedResultProps) {
       icon: User,
       color: "purple",
     },
-    ...(result.suggestedAction ? [{
+    {
       key: "suggestedAction",
       title: "Suggested Next Step",
       content: result.suggestedAction,
       icon: ArrowRight,
       color: "amber",
-    }] : []),
+    },
   ];
 
   const colorClasses = {
