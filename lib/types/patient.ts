@@ -56,6 +56,8 @@ export const LOINC_CODES = {
   NON_HDL_CHOLESTEROL: '43396-1',
   APOLIPOPROTEIN_B: '1884-6',
   LIPOPROTEIN_A: '10835-7',
+  VITAMIN_D: '1989-3',  // 25-hydroxyvitamin D total
+  VITAMIN_D_25: '35365-6',  // 25-hydroxyvitamin D3
   HBA1C: '4548-4',
   FASTING_GLUCOSE: '1558-6',
   EGFR: '33914-3',
@@ -106,6 +108,9 @@ export const BIOMARKER_LOINC_MAP: Record<string, string[]> = {
   'apo b': [LOINC_CODES.APOLIPOPROTEIN_B],
   'lipoprotein(a)': [LOINC_CODES.LIPOPROTEIN_A],
   'lp(a)': [LOINC_CODES.LIPOPROTEIN_A],
+  'vitamin d': [LOINC_CODES.VITAMIN_D, LOINC_CODES.VITAMIN_D_25],
+  '25-hydroxyvitamin d': [LOINC_CODES.VITAMIN_D, LOINC_CODES.VITAMIN_D_25],
+  '25-oh vitamin d': [LOINC_CODES.VITAMIN_D, LOINC_CODES.VITAMIN_D_25],
   'hba1c': [LOINC_CODES.HBA1C],
   'hemoglobin a1c': [LOINC_CODES.HBA1C],
   'glycated hemoglobin': [LOINC_CODES.HBA1C],

@@ -100,6 +100,19 @@ function performRuleBasedChecks(
     }
   }
 
+  // Check excluded conditions (patient should NOT have these)
+  if (paper.populationDemographics?.excludedConditions) {
+    for (const excludedCondition of paper.populationDemographics.excludedConditions) {
+      if (hasCondition(patient, excludedCondition)) {
+        reasons.push({
+          type: 'exclusion',
+          description: `Patient has excluded condition: ${excludedCondition}`,
+          details: `The study excluded patients who already have ${excludedCondition}`,
+        });
+      }
+    }
+  }
+
   // Check if at least ONE key biomarker is available
   // We only require the primary biomarker (first in list) OR any of the first 3
   const biomarkersToCheck = paper.biomarkers.slice(0, 3);

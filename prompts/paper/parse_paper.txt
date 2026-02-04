@@ -33,10 +33,12 @@ Return your response as a JSON object with the following structure:
     "ageRange": "Age range as string, e.g., '40-75 years'",
     "minAge": 40,
     "maxAge": 75,
-    "requiredConditions": ["Use standardized terms - see instructions below"],
+    "requiredConditions": ["Conditions patient must HAVE at baseline - see instructions below"],
     "requiredConditionLogic": "OR or AND - whether patient needs ANY ONE condition or ALL conditions",
-    "requiredMedications": ["Use standardized class names - see instructions below"]
+    "requiredMedications": ["Use standardized class names - see instructions below"],
+    "excludedConditions": ["Conditions that would EXCLUDE a patient from the study"]
   },
+  "studyType": "treatment or prevention - see instructions below",
   "intervention": "The treatment or intervention being studied WITH DOSING, e.g., 'evolocumab 140 mg subcutaneously every 2 weeks or 420 mg monthly'",
   "comparator": "The control/comparator group",
   "primaryEndpoint": "The primary endpoint of the study",
@@ -83,8 +85,26 @@ Return your response as a JSON object with the following structure:
 - Hazard ratio < 1 indicates benefit for the intervention group
 - NNT (number needed to treat) should be a positive integer
 
+## Study Type - CRITICAL DISTINCTION
+Determine if this is a TREATMENT study or a PREVENTION study:
+
+- **Treatment study**: Patients must HAVE a condition at baseline (e.g., FOURIER requires ASCVD)
+  - Set studyType: "treatment"
+  - List the required condition in requiredConditions
+
+- **Prevention study**: Study examines RISK of developing a condition (e.g., vitamin D and risk of T2D)
+  - Set studyType: "prevention"
+  - Do NOT list the outcome condition in requiredConditions
+  - The condition being prevented is the PRIMARY ENDPOINT, not a requirement
+  - Example: A study about "low vitamin D and risk of type 2 diabetes" should NOT require T2D
+
+- **Risk factor study**: Study examines association between exposure and outcome
+  - Set studyType: "prevention"
+  - requiredConditions should only include baseline requirements (if any)
+
 ## Required Conditions and Medications - IMPORTANT
-Use STANDARDIZED clinical terms, not literal text from the paper:
+Use STANDARDIZED clinical terms, not literal text from the paper.
+ONLY list conditions the patient must HAVE at enrollment, NOT the outcome being studied:
 
 For conditions, use these normalized terms:
 - "atherosclerotic cardiovascular disease" (for ASCVD, CHD, CAD)
