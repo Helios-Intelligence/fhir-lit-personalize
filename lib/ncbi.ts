@@ -85,11 +85,16 @@ export async function fetchFullTextFromPMC(pmid: string): Promise<string | null>
     if (!linkResponse.ok) return null;
 
     const linkResult = await linkResponse.json();
+
+    // IMPORTANT: Only use 'pubmed_pmc' link (actual full text), NOT 'pubmed_pmc_refs' (citing articles)
     const pmcLinks = linkResult.linksets?.[0]?.linksetdbs?.find(
-      (db: any) => db.dbto === 'pmc'
+      (db: any) => db.dbto === 'pmc' && db.linkname === 'pubmed_pmc'
     );
 
-    if (!pmcLinks?.links?.[0]) return null;
+    if (!pmcLinks?.links?.[0]) {
+      console.log(`[NCBI] No PMC full text available for PMID ${pmid} (paper may not be open access)`);
+      return null;
+    }
 
     const pmcid = pmcLinks.links[0];
 
