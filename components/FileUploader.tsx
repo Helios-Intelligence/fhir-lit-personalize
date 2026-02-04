@@ -11,14 +11,27 @@ interface FileUploaderProps {
   disabled?: boolean;
 }
 
+// Vercel serverless functions have a ~4.5MB request body limit
+const MAX_FILE_SIZE_MB = 4;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 export function FileUploader({ onFileAccepted, onError, disabled }: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [fileSize, setFileSize] = useState<number | null>(null);
   const [isValid, setIsValid] = useState<boolean | null>(null);
 
   const handleFile = useCallback(async (file: File) => {
     setFileName(file.name);
+    setFileSize(file.size);
     setIsValid(null);
+
+    // Check file size first
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setIsValid(false);
+      onError(`File is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is ${MAX_FILE_SIZE_MB}MB. Please use a smaller FHIR export or filter to relevant resources.`);
+      return;
+    }
 
     try {
       const text = await file.text();
@@ -84,6 +97,7 @@ export function FileUploader({ onFileAccepted, onError, disabled }: FileUploader
 
   const clearFile = useCallback(() => {
     setFileName(null);
+    setFileSize(null);
     setIsValid(null);
   }, []);
 
@@ -169,7 +183,7 @@ export function FileUploader({ onFileAccepted, onError, disabled }: FileUploader
               <span className="text-sm text-gray-500"> or drag and drop</span>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              FHIR Bundle JSON file
+              FHIR Bundle JSON file (max {MAX_FILE_SIZE_MB}MB)
             </p>
           </div>
         )}
