@@ -11,51 +11,47 @@ Generate a personalized interpretation of the study findings for this specific p
 
 ## 1. Study Summary (studySummary)
 Write 2-3 sentences summarizing what the study found. Include:
-- The intervention and dosing regimen (e.g., "evolocumab 140 mg injected every 2 weeks or 420 mg monthly")
+- The medication name and what it does
 - The key quantitative finding (e.g., "reduced LDL cholesterol by 59%")
-- The clinical outcome (e.g., "15% lower risk of heart attacks and strokes")
+- The clinical benefit (e.g., "15% lower risk of heart attacks and strokes")
 
 ## 2. Patient-Specific Projection (patientProjection)
-Calculate and show SPECIFIC numbers based on the patient's actual lab values:
-- If LDL is available and the study shows % reduction, CALCULATE the projected LDL:
-  Example: "Your LDL is currently 165 mg/dL. Based on this study's 59% reduction, adding evolocumab could potentially lower your LDL to around 68 mg/dL."
-- Include the exact dosing options from the intervention
-- Mention how this would work with their current medications
-- Show the math clearly so patients understand the projection
+Give SPECIFIC projected numbers based on the patient's actual lab values. Be direct and concise:
+- State their current value and projected value clearly: "Your LDL is 165 mg/dL. With this treatment, it could drop to around 68 mg/dL."
+- Include the dosing options: "This would involve injections of evolocumab - either 140 mg every two weeks or 420 mg once monthly."
+- If different doses have different effects, present both options with their respective outcomes
+- Mention how it fits with their current medications
+- Do NOT show the math or percentages in the projection - just the before/after numbers
 
 ## 3. Contextualized Risk (contextualizedRisk)
-Frame the benefits using concrete "N out of 100" language:
-- Use the hazard ratio and baseline event rate to calculate absolute risk reduction
-- Example: "Over 2.2 years in this study, about 11 out of 100 patients on standard treatment had a cardiovascular event. With evolocumab added, only about 10 out of 100 did - meaning roughly 1-2 fewer events per 100 patients treated."
-- Include the Number Needed to Treat (NNT) if available
+Frame the benefits using "you" language and concrete numbers:
+- Address the patient directly: "For someone like you with heart disease..."
+- Use specific numbers: "Over 2 years, your risk of a heart attack, stroke, or other major cardiac event would go from about 11% to about 9%."
+- Express the benefit personally: "That means adding this medication could reduce your chances of experiencing one of these events."
+- Include the timeframe from the study
 
 # Tone Guidelines
-- Conversational and empowering, not alarming
-- Use "you" and "your" to personalize
-- Include appropriate caveats ("Based on this study...", "Individual results may vary...")
-- Be specific with numbers - patients want to know actual projections
-- Be honest about limitations
+- Speak directly TO the patient using "you" and "your"
+- Be specific with numbers - no vague language
+- Don't show calculations or percentages in the patient projection
+- Present final numbers only (before → after)
+- Warm but factual tone
+- Include appropriate caveats naturally
 
 # Output Format
 Return your response as a JSON object:
 
 {
-  "studySummary": "2-3 sentences with intervention details, dosing, and key findings",
-  "patientProjection": "Specific calculations using patient's actual values, including projected numbers and dosing",
-  "contextualizedRisk": "Risk framed as 'N out of 100' with specific numbers and follow-up duration"
+  "studySummary": "2-3 sentences about what the study found",
+  "patientProjection": "Your current values, projected outcomes, and dosing options - no math shown",
+  "contextualizedRisk": "Risk framed with 'you' language and specific numbers over the study timeframe"
 }
 
-# Calculation Guidelines
-- For LDL reduction: new_LDL = current_LDL × (1 - percent_reduction)
-- For absolute risk reduction: baseline_rate × (1 - relative_risk_reduction)
-- Always show the patient's starting value and the projected value
-- Round to sensible precision (whole numbers for LDL, one decimal for percentages)
-
-# Important Notes
-- ALWAYS include specific dosing information from the intervention
-- ALWAYS calculate projected values when patient lab values are available
-- If specific values aren't available, explain what values would be needed
-- Mention the follow-up duration when discussing risk
-- If the patient's values differ significantly from study population, note this
+# Key Rules
+- NEVER show math or formulas
+- ALWAYS use "you/your" when discussing the patient
+- ALWAYS include specific dosing (dose amount and frequency)
+- If multiple dose options exist with different effects, present each option's outcome
+- Round numbers sensibly (whole numbers for LDL, etc.)
 
 Return only the JSON object, no additional text.
