@@ -225,6 +225,37 @@ export function getBiomarkerValue(patient: ExtractedPatient, biomarkerName: stri
  * These are authoritative clinical codes for matching
  */
 const CONDITION_CODES: Record<string, { snomed: string[], icd10: string[], terms: string[] }> = {
+  // Specific conditions from normalized prompt terms
+  'prior myocardial infarction': {
+    snomed: ['22298006', '399211009', '401314000'],
+    icd10: ['I21', 'I22', 'I25.2', 'Z86.79'],
+    terms: ['myocardial infarction', 'heart attack', 'mi', 'stemi', 'nstemi', 'prior mi', 'history of mi'],
+  },
+  'prior stroke': {
+    snomed: ['230690007', '266257000', '399261000', '422504002'],
+    icd10: ['I63', 'I64', 'Z86.73'],
+    terms: ['stroke', 'cva', 'cerebrovascular accident', 'tia', 'transient ischemic attack', 'prior stroke', 'history of stroke'],
+  },
+  'peripheral artery disease': {
+    snomed: ['400047006', '64156001', '233970002'],
+    icd10: ['I70.2', 'I73', 'I73.9'],
+    terms: ['peripheral artery disease', 'pad', 'peripheral vascular disease', 'pvd', 'claudication'],
+  },
+  'type 2 diabetes': {
+    snomed: ['44054006'],
+    icd10: ['E11'],
+    terms: ['type 2 diabetes', 't2dm', 'diabetes mellitus type 2', 'type ii diabetes', 'dm2'],
+  },
+  'chronic kidney disease': {
+    snomed: ['709044004', '431855005', '431856006', '431857002', '433146000'],
+    icd10: ['N18', 'N18.1', 'N18.2', 'N18.3', 'N18.4', 'N18.5', 'N18.6', 'N18.9'],
+    terms: ['chronic kidney disease', 'ckd', 'renal insufficiency', 'kidney failure'],
+  },
+  'hyperlipidemia': {
+    snomed: ['55822004', '398036000', '13644009'],
+    icd10: ['E78', 'E78.0', 'E78.1', 'E78.2', 'E78.4', 'E78.5'],
+    terms: ['hyperlipidemia', 'dyslipidemia', 'high cholesterol', 'hypercholesterolemia', 'hypertriglyceridemia'],
+  },
   'atherosclerotic cardiovascular disease': {
     snomed: [
       '53741008',   // Coronary artery disease
@@ -307,6 +338,19 @@ const CONDITION_CODES: Record<string, { snomed: string[], icd10: string[], terms
  * RxNorm codes and names for medication classes
  */
 const MEDICATION_CODES: Record<string, { rxnorm: string[], terms: string[] }> = {
+  // High-intensity statin: atorvastatin 40-80mg, rosuvastatin 20-40mg
+  'high-intensity statin': {
+    rxnorm: ['83367', '301542'],  // Atorvastatin, Rosuvastatin
+    terms: ['atorvastatin', 'rosuvastatin', 'lipitor', 'crestor'],
+  },
+  'ezetimibe': {
+    rxnorm: ['341248'],
+    terms: ['ezetimibe', 'zetia'],
+  },
+  'pcsk9 inhibitor': {
+    rxnorm: ['1657974', '1659149'],  // Evolocumab, Alirocumab
+    terms: ['evolocumab', 'alirocumab', 'repatha', 'praluent', 'pcsk9'],
+  },
   'statin': {
     rxnorm: [
       '83367',   // Atorvastatin

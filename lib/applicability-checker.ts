@@ -59,14 +59,30 @@ function performRuleBasedChecks(
   }
 
   // Check required conditions
-  if (paper.populationDemographics?.requiredConditions) {
-    for (const requiredCondition of paper.populationDemographics.requiredConditions) {
-      if (!hasCondition(patient, requiredCondition)) {
+  if (paper.populationDemographics?.requiredConditions && paper.populationDemographics.requiredConditions.length > 0) {
+    const requiredConditions = paper.populationDemographics.requiredConditions;
+    const conditionLogic = paper.populationDemographics.requiredConditionLogic || 'AND';
+
+    if (conditionLogic === 'OR') {
+      // Patient needs ANY ONE of the conditions
+      const hasAnyCondition = requiredConditions.some(cond => hasCondition(patient, cond));
+      if (!hasAnyCondition) {
         reasons.push({
           type: 'condition',
-          description: `Patient does not have required condition: ${requiredCondition}`,
-          details: `The study required patients to have ${requiredCondition}`,
+          description: `Patient does not have any of the required conditions`,
+          details: `The study required patients to have at least one of: ${requiredConditions.join(', ')}`,
         });
+      }
+    } else {
+      // Patient needs ALL conditions (AND logic - default)
+      for (const requiredCondition of requiredConditions) {
+        if (!hasCondition(patient, requiredCondition)) {
+          reasons.push({
+            type: 'condition',
+            description: `Patient does not have required condition: ${requiredCondition}`,
+            details: `The study required patients to have ${requiredCondition}`,
+          });
+        }
       }
     }
   }

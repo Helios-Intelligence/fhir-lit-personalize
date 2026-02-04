@@ -27,8 +27,9 @@ Return your response as a JSON object with the following structure:
     "ageRange": "Age range as string, e.g., '40-75 years'",
     "minAge": 40,
     "maxAge": 75,
-    "requiredConditions": ["List of conditions required for enrollment, e.g., 'atherosclerotic cardiovascular disease', 'prior MI'"],
-    "requiredMedications": ["List of medications required, e.g., 'statin therapy'"]
+    "requiredConditions": ["Use standardized terms - see instructions below"],
+    "requiredConditionLogic": "OR or AND - whether patient needs ANY ONE condition or ALL conditions",
+    "requiredMedications": ["Use standardized class names - see instructions below"]
   },
   "intervention": "The treatment or intervention being studied WITH DOSING, e.g., 'evolocumab 140 mg subcutaneously every 2 weeks or 420 mg monthly'",
   "comparator": "The control/comparator group",
@@ -65,9 +66,40 @@ Return your response as a JSON object with the following structure:
 - Hazard ratio < 1 indicates benefit for the intervention group
 - NNT (number needed to treat) should be a positive integer
 
+## Required Conditions and Medications - IMPORTANT
+Use STANDARDIZED clinical terms, not literal text from the paper:
+
+For conditions, use these normalized terms:
+- "atherosclerotic cardiovascular disease" (for ASCVD, CHD, CAD)
+- "prior myocardial infarction" (for history of MI, heart attack)
+- "prior stroke" (for history of stroke, CVA)
+- "peripheral artery disease" (for PAD, peripheral vascular disease)
+- "type 2 diabetes" (for T2DM, diabetes mellitus type 2)
+- "chronic kidney disease" (for CKD)
+- "heart failure" (for HF, CHF)
+- "hypertension" (for HTN, high blood pressure)
+- "hyperlipidemia" (for dyslipidemia, high cholesterol)
+
+For medications, use these normalized class names:
+- "statin" (for any statin - atorvastatin, rosuvastatin, simvastatin, etc.)
+- "high-intensity statin" (for atorvastatin 40-80mg, rosuvastatin 20-40mg)
+- "ezetimibe"
+- "PCSK9 inhibitor" (for evolocumab, alirocumab)
+- "ACE inhibitor" (for lisinopril, enalapril, ramipril, etc.)
+- "ARB" (for losartan, valsartan, etc.)
+- "beta blocker" (for metoprolol, carvedilol, etc.)
+- "antiplatelet" (for aspirin, clopidogrel, etc.)
+
+If the study requires ANY ONE of several conditions (OR logic), set "requiredConditionLogic": "OR"
+If the study requires ALL conditions (AND logic), set "requiredConditionLogic": "AND" (default)
+
+Example: FOURIER required ASCVD defined as prior MI OR prior stroke OR PAD:
+"requiredConditions": ["prior myocardial infarction", "prior stroke", "peripheral artery disease"],
+"requiredConditionLogic": "OR"
+
 ## General
 - If a value is not mentioned in the paper, omit that field
-- For conditions and medications, use common clinical terminology
-- Be specific about what conditions qualify (e.g., "atherosclerotic cardiovascular disease" not just "heart disease")
+- Do NOT include qualifiers like "(preferably)", "(at least)", "(with or without)" in the arrays
+- Keep terms simple and matchable
 
 Return only the JSON object, no additional text.

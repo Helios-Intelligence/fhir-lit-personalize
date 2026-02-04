@@ -22,6 +22,7 @@ export const ParsedPaperSchema = z.object({
     minAge: z.number().optional().nullable().describe('Minimum age in years'),
     maxAge: z.number().optional().nullable().describe('Maximum age in years'),
     requiredConditions: z.array(z.string()).optional().nullable().describe('Conditions required for inclusion'),
+    requiredConditionLogic: z.enum(['AND', 'OR']).optional().nullable().describe('Whether patient needs ALL conditions (AND) or ANY ONE (OR)'),
     requiredMedications: z.array(z.string()).optional().nullable().describe('Medications required for inclusion'),
   }).optional().nullable(),
   intervention: z.string().optional().nullable().describe('The intervention being studied'),
