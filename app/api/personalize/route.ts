@@ -219,28 +219,34 @@ async function generatePersonalizedOutput(
     }
   }
 
-  if (paper.keyFindings.hazardRatio) {
-    findingsLines.push(`\nClinical Outcomes:`);
-    findingsLines.push(`- Hazard Ratio: ${paper.keyFindings.hazardRatio}`);
-    if (paper.keyFindings.hazardRatioCI) {
-      findingsLines.push(`- 95% CI: ${paper.keyFindings.hazardRatioCI.lower} - ${paper.keyFindings.hazardRatioCI.upper}`);
-    }
-  }
+  // Pre-compute plain-language absolute risk numbers for the LLM
+  // so it doesn't need to work from (or parrot) technical statistics
+  findingsLines.push(`\nClinical Outcomes (use these numbers directly - do NOT mention hazard ratios or technical statistics):`);
 
-  if (paper.keyFindings.relativeRiskReduction) {
-    findingsLines.push(`- Relative Risk Reduction: ${(paper.keyFindings.relativeRiskReduction * 100).toFixed(0)}%`);
-  }
-
-  if (paper.keyFindings.absoluteRiskReduction) {
-    findingsLines.push(`- Absolute Risk Reduction: ${(paper.keyFindings.absoluteRiskReduction * 100).toFixed(1)}%`);
-  }
-
-  if (paper.keyFindings.nnt) {
-    findingsLines.push(`- Number Needed to Treat: ${paper.keyFindings.nnt}`);
-  }
-
-  if (paper.baselineEventRate) {
-    findingsLines.push(`- Baseline Event Rate: ${(paper.baselineEventRate * 100).toFixed(1)}%`);
+  if (paper.baselineEventRate && paper.keyFindings.hazardRatio) {
+    const baselinePer100 = Math.round(paper.baselineEventRate * 100);
+    const treatmentPer100 = Math.round(paper.baselineEventRate * paper.keyFindings.hazardRatio * 100);
+    const benefitPer100 = baselinePer100 - treatmentPer100;
+    findingsLines.push(`- Without treatment: about ${baselinePer100} out of 100 people experienced the primary outcome over the study period`);
+    findingsLines.push(`- With treatment: about ${treatmentPer100} out of 100 people experienced the primary outcome over the study period`);
+    findingsLines.push(`- Absolute benefit: about ${benefitPer100} fewer events per 100 people treated`);
+  } else if (paper.baselineEventRate && paper.keyFindings.absoluteRiskReduction) {
+    const baselinePer100 = Math.round(paper.baselineEventRate * 100);
+    const treatmentPer100 = Math.round((paper.baselineEventRate - paper.keyFindings.absoluteRiskReduction) * 100);
+    const benefitPer100 = baselinePer100 - treatmentPer100;
+    findingsLines.push(`- Without treatment: about ${baselinePer100} out of 100 people experienced the primary outcome over the study period`);
+    findingsLines.push(`- With treatment: about ${treatmentPer100} out of 100 people experienced the primary outcome over the study period`);
+    findingsLines.push(`- Absolute benefit: about ${benefitPer100} fewer events per 100 people treated`);
+  } else if (paper.keyFindings.absoluteRiskReduction) {
+    const arrPer100 = Math.round(paper.keyFindings.absoluteRiskReduction * 100);
+    findingsLines.push(`- Absolute benefit: about ${arrPer100} fewer events per 100 people treated`);
+  } else if (paper.keyFindings.hazardRatio) {
+    // No baseline rate available - provide qualitative direction only
+    const direction = paper.keyFindings.hazardRatio < 1 ? 'reduced' : 'increased';
+    findingsLines.push(`- The treatment was associated with ${direction} risk of the primary outcome (describe qualitatively, do NOT cite specific numbers you cannot verify)`);
+  } else if (paper.keyFindings.relativeRiskReduction) {
+    // Only relative risk available - provide qualitative direction
+    findingsLines.push(`- The treatment was associated with reduced risk of the primary outcome (describe qualitatively, do NOT cite specific numbers you cannot verify)`);
   }
 
   const prompt = loadPromptWithVariables('personalize/generate_output', {
