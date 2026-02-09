@@ -10,6 +10,46 @@ import type {
 import type { ExtractedPatient, ObservationValue, PatientCondition, PatientMedication } from './types/patient';
 import { LOINC_CODES, SNOMED_CODES, BIOMARKER_LOINC_MAP } from './types/patient';
 
+// SNOMED codes used for clinical status in some FHIR bundles
+const CLINICAL_STATUS_SNOMED: Record<string, string> = {
+  '55561003': 'active',
+  '73425007': 'inactive',
+  '413322009': 'resolved',
+  '24484000': 'recurrence',
+  '723506003': 'relapse',
+  '277022003': 'remission',
+};
+
+/**
+ * Normalize clinical status from various FHIR representations.
+ * Some bundles use standard strings ('active'), others use SNOMED codes ('55561003'),
+ * and some put it in the text or display fields.
+ */
+function normalizeClinicalStatus(clinicalStatus: any): string {
+  if (!clinicalStatus) return 'unknown';
+
+  // Check coding[0].code — could be standard string or SNOMED code
+  const code = clinicalStatus.coding?.[0]?.code;
+  if (code) {
+    const lower = code.toLowerCase();
+    if (['active', 'resolved', 'recurrence', 'inactive', 'remission', 'relapse'].includes(lower)) {
+      return lower;
+    }
+    // Map SNOMED status codes
+    if (CLINICAL_STATUS_SNOMED[code]) {
+      return CLINICAL_STATUS_SNOMED[code];
+    }
+  }
+
+  // Fall back to display or text
+  const display = (clinicalStatus.coding?.[0]?.display || clinicalStatus.text || '').toLowerCase().trim();
+  if (['active', 'resolved', 'recurrence', 'inactive', 'remission', 'relapse'].includes(display)) {
+    return display;
+  }
+
+  return 'unknown';
+}
+
 /**
  * Extract patient data from FHIR bundle for literature personalization
  * Simplified version focused on biomarker-relevant data
@@ -128,9 +168,9 @@ export function extractPatientData(bundle: IBundle): ExtractedPatient {
   // Extract conditions with all available codes
   const extractedConditions: PatientCondition[] = conditions
     .filter(cond => {
-      // Include active conditions or resolved conditions that may be relevant history
-      const clinicalStatus = cond.clinicalStatus?.coding?.[0]?.code;
-      return clinicalStatus === 'active' || clinicalStatus === 'resolved' || clinicalStatus === 'recurrence';
+      // Resolve clinical status from code, display, or text (some FHIR bundles use SNOMED codes instead of standard strings)
+      const status = normalizeClinicalStatus(cond.clinicalStatus);
+      return status === 'active' || status === 'resolved' || status === 'recurrence';
     })
     .map(cond => {
       const codings = cond.code?.coding || [];
@@ -138,7 +178,7 @@ export function extractPatientData(bundle: IBundle): ExtractedPatient {
         display: cond.code?.text || cond.code?.coding?.[0]?.display || 'Unknown condition',
         snomedCode: codings.find(c => c.system?.includes('snomed'))?.code,
         icd10Code: codings.find(c => c.system?.includes('icd-10') || c.system?.includes('icd10'))?.code,
-        clinicalStatus: cond.clinicalStatus?.coding?.[0]?.code || 'unknown',
+        clinicalStatus: normalizeClinicalStatus(cond.clinicalStatus),
         onsetDate: cond.onsetDateTime || cond.onsetPeriod?.start,
       };
     });
@@ -227,9 +267,9 @@ export function getBiomarkerValue(patient: ExtractedPatient, biomarkerName: stri
 const CONDITION_CODES: Record<string, { snomed: string[], icd10: string[], terms: string[] }> = {
   // Specific conditions from normalized prompt terms
   'prior myocardial infarction': {
-    snomed: ['22298006', '399211009', '401314000'],
+    snomed: ['22298006', '399211009', '401314000', '57054005'],
     icd10: ['I21', 'I22', 'I25.2', 'Z86.79'],
-    terms: ['myocardial infarction', 'heart attack', 'mi', 'stemi', 'nstemi', 'prior mi', 'history of mi'],
+    terms: ['myocardial infarction', 'heart attack', 'mi', 'stemi', 'nstemi', 'prior mi', 'history of mi', 'acute mi'],
   },
   'prior stroke': {
     snomed: ['230690007', '266257000', '399261000', '422504002'],
@@ -259,8 +299,12 @@ const CONDITION_CODES: Record<string, { snomed: string[], icd10: string[], terms
   'atherosclerotic cardiovascular disease': {
     snomed: [
       '53741008',   // Coronary artery disease
+      '443502000',  // Coronary atherosclerosis (Atherosclerosis of coronary artery)
+      '285151000119108', // CAD of autologous bypass graft
+      '429673002',  // CAD involving coronary bypass graft
       '414545008',  // Ischemic heart disease
       '22298006',   // Myocardial infarction
+      '57054005',   // Acute myocardial infarction
       '230690007',  // Stroke / CVA
       '266257000',  // TIA
       '399211009',  // History of MI
@@ -289,12 +333,14 @@ const CONDITION_CODES: Record<string, { snomed: string[], icd10: string[], terms
     ],
     terms: [
       'coronary artery disease', 'cad', 'coronary heart disease', 'chd',
+      'coronary atherosclerosis', 'atherosclerotic heart disease', 'atherosclerotic cardiovascular',
       'myocardial infarction', 'mi', 'heart attack',
       'stroke', 'cerebrovascular accident', 'cva', 'tia', 'transient ischemic attack',
       'peripheral artery disease', 'pad', 'peripheral vascular disease', 'pvd',
       'carotid stenosis', 'carotid artery disease',
       'ascvd', 'ischemic heart disease', 'angina', 'acute coronary syndrome',
       'stemi', 'nstemi', 'unstable angina', 'cabg', 'bypass', 'stent', 'pci',
+      'coronary artery bypass', 'angioplasty', 'ptca',
     ],
   },
   'cardiovascular disease': {

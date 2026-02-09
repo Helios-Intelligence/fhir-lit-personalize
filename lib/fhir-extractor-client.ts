@@ -3,6 +3,35 @@
  * Extracts patient data from FHIR bundle and serializes for API transmission
  */
 
+// SNOMED codes used for clinical status in some FHIR bundles
+const CLINICAL_STATUS_SNOMED: Record<string, string> = {
+  '55561003': 'active',
+  '73425007': 'inactive',
+  '413322009': 'resolved',
+  '24484000': 'recurrence',
+  '723506003': 'relapse',
+  '277022003': 'remission',
+};
+
+function normalizeClinicalStatus(clinicalStatus: any): string {
+  if (!clinicalStatus) return 'unknown';
+  const code = clinicalStatus.coding?.[0]?.code;
+  if (code) {
+    const lower = code.toLowerCase();
+    if (['active', 'resolved', 'recurrence', 'inactive', 'remission', 'relapse'].includes(lower)) {
+      return lower;
+    }
+    if (CLINICAL_STATUS_SNOMED[code]) {
+      return CLINICAL_STATUS_SNOMED[code];
+    }
+  }
+  const display = (clinicalStatus.coding?.[0]?.display || clinicalStatus.text || '').toLowerCase().trim();
+  if (['active', 'resolved', 'recurrence', 'inactive', 'remission', 'relapse'].includes(display)) {
+    return display;
+  }
+  return 'unknown';
+}
+
 interface ObservationValue {
   value: number | string;
   unit?: string;
@@ -158,8 +187,8 @@ export function extractPatientDataClient(bundle: any): SerializedPatient {
   // Extract conditions with all available codes
   const extractedConditions: PatientCondition[] = conditions
     .filter(cond => {
-      const clinicalStatus = cond.clinicalStatus?.coding?.[0]?.code;
-      return clinicalStatus === 'active' || clinicalStatus === 'resolved' || clinicalStatus === 'recurrence';
+      const status = normalizeClinicalStatus(cond.clinicalStatus);
+      return status === 'active' || status === 'resolved' || status === 'recurrence';
     })
     .map(cond => {
       const codings = cond.code?.coding || [];
@@ -167,7 +196,7 @@ export function extractPatientDataClient(bundle: any): SerializedPatient {
         display: cond.code?.text || cond.code?.coding?.[0]?.display || 'Unknown condition',
         snomedCode: codings.find((c: any) => c.system?.includes('snomed'))?.code,
         icd10Code: codings.find((c: any) => c.system?.includes('icd-10') || c.system?.includes('icd10'))?.code,
-        clinicalStatus: cond.clinicalStatus?.coding?.[0]?.code || 'unknown',
+        clinicalStatus: normalizeClinicalStatus(cond.clinicalStatus),
         onsetDate: cond.onsetDateTime || cond.onsetPeriod?.start,
       };
     });
