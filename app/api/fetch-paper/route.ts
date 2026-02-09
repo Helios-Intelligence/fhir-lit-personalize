@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchByPMID, fetchByDOI, fetchFullTextFromPMC, fetchPDFFromPMC, fetchPDFFromUnpaywall } from '@/lib/ncbi';
+import { fetchByPMID, fetchByDOI, fetchFullTextFromPMC, fetchPDFFromPMC, fetchPDFFromUnpaywall, fetchPDFFromCORE } from '@/lib/ncbi';
 import { extractTextFromPDF } from '@/lib/pdf-parser';
 
 export const runtime = 'nodejs';
@@ -78,20 +78,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fallback: if no PMC full text, try Unpaywall to find an open access PDF
+    // Fallback cascade: if no PMC full text, try Unpaywall then CORE
     const doi = metadata.doi || (type === 'doi' ? cleanId : null);
     if (!fullText && doi) {
       console.log(`[fetch-paper] No PMC text, trying Unpaywall for DOI ${doi}`);
       pdfBase64 = await fetchPDFFromUnpaywall(doi);
+
+      // If Unpaywall failed, try CORE
+      if (!pdfBase64) {
+        console.log(`[fetch-paper] Unpaywall failed, trying CORE for DOI ${doi}`);
+        pdfBase64 = await fetchPDFFromCORE(doi);
+      }
 
       if (pdfBase64) {
         // Extract text from the downloaded PDF
         try {
           const pdfBuffer = Buffer.from(pdfBase64, 'base64');
           fullText = await extractTextFromPDF(pdfBuffer);
-          console.log(`[fetch-paper] Extracted ${fullText.length} chars from Unpaywall PDF`);
+          console.log(`[fetch-paper] Extracted ${fullText.length} chars from open access PDF`);
         } catch (extractError) {
-          console.error('[fetch-paper] Failed to extract text from Unpaywall PDF:', extractError);
+          console.error('[fetch-paper] Failed to extract text from PDF:', extractError);
           // Keep pdfBase64 for multimodal even if text extraction fails
         }
       }

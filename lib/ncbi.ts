@@ -256,6 +256,71 @@ export async function fetchPDFFromUnpaywall(doi: string): Promise<string | null>
 }
 
 /**
+ * Fetch an open-access PDF via CORE when Unpaywall fails.
+ * CORE aggregates papers from institutional repositories worldwide.
+ * Free API (no key needed for basic search), returns downloadable PDF URLs.
+ */
+export async function fetchPDFFromCORE(doi: string): Promise<string | null> {
+  try {
+    const normalizedDoi = doi.toLowerCase();
+    const searchUrl = `https://api.core.ac.uk/v3/search/works/?q=doi:${encodeURIComponent(doi)}&limit=5`;
+
+    const response = await fetch(searchUrl, {
+      headers: { 'User-Agent': 'FHIRLitPersonalize/1.0' },
+    });
+
+    if (!response.ok) {
+      console.log(`[CORE] API returned ${response.status} for DOI ${doi}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const results = data.results || [];
+
+    // Find the exact DOI match (CORE search is fuzzy)
+    const match = results.find((r: any) => r.doi?.toLowerCase() === normalizedDoi);
+    if (!match?.downloadUrl) {
+      console.log(`[CORE] No exact DOI match with downloadUrl for ${doi}`);
+      return null;
+    }
+
+    console.log(`[CORE] Found PDF: ${match.downloadUrl}`);
+    const pdfResponse = await fetch(match.downloadUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; FHIRLitPersonalize/1.0)',
+        'Accept': 'application/pdf',
+      },
+      redirect: 'follow',
+    });
+
+    if (!pdfResponse.ok) {
+      console.log(`[CORE] PDF download failed (${pdfResponse.status})`);
+      return null;
+    }
+
+    const contentType = pdfResponse.headers.get('content-type') || '';
+    if (!contentType.includes('pdf') && !contentType.includes('octet-stream')) {
+      console.log(`[CORE] Response is not PDF: ${contentType}`);
+      return null;
+    }
+
+    const arrayBuffer = await pdfResponse.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    if (buffer.length < 5000) {
+      console.log(`[CORE] PDF too small (${buffer.length} bytes), skipping`);
+      return null;
+    }
+
+    console.log(`[CORE] Downloaded PDF for DOI ${doi}: ${(buffer.length / 1024).toFixed(0)} KB`);
+    return buffer.toString('base64');
+  } catch (error) {
+    console.error('[CORE] Error:', error);
+    return null;
+  }
+}
+
+/**
  * Parse article metadata from NCBI efetch XML response
  */
 function parseArticleXML(xmlText: string, pmid: string): PaperMetadata {
