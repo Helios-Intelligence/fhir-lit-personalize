@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     // Parse paper with LLM
     const { paper: parsedPaper, usage } = await parsePaperWithLLM(paperText);
 
-    // Use metadata title if LLM didn't extract one
-    if (!parsedPaper.title && metadata?.title) {
+    // Prefer metadata title (from PubMed) — it's authoritative
+    if (metadata?.title) {
       parsedPaper.title = metadata.title;
     }
 
