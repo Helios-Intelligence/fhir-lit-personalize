@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchByPMID, fetchByDOI, fetchFullTextFromPMC, fetchPDFFromPMC } from '@/lib/ncbi';
+import { fetchByPMID, fetchByDOI, fetchFullTextFromPMC, fetchPDFFromPMC, fetchPDFFromUnpaywall } from '@/lib/ncbi';
+import { extractTextFromPDF } from '@/lib/pdf-parser';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -74,6 +75,25 @@ export async function POST(request: NextRequest) {
       // If we have a PMCID, also fetch the PDF for multimodal processing
       if (pmcid) {
         pdfBase64 = await fetchPDFFromPMC(pmcid);
+      }
+    }
+
+    // Fallback: if no PMC full text, try Unpaywall to find an open access PDF
+    const doi = metadata.doi || (type === 'doi' ? cleanId : null);
+    if (!fullText && doi) {
+      console.log(`[fetch-paper] No PMC text, trying Unpaywall for DOI ${doi}`);
+      pdfBase64 = await fetchPDFFromUnpaywall(doi);
+
+      if (pdfBase64) {
+        // Extract text from the downloaded PDF
+        try {
+          const pdfBuffer = Buffer.from(pdfBase64, 'base64');
+          fullText = await extractTextFromPDF(pdfBuffer);
+          console.log(`[fetch-paper] Extracted ${fullText.length} chars from Unpaywall PDF`);
+        } catch (extractError) {
+          console.error('[fetch-paper] Failed to extract text from Unpaywall PDF:', extractError);
+          // Keep pdfBase64 for multimodal even if text extraction fails
+        }
       }
     }
 

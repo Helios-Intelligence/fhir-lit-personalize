@@ -166,6 +166,96 @@ export async function fetchPDFFromPMC(pmcid: string): Promise<string | null> {
 }
 
 /**
+ * Fetch an open-access PDF via Unpaywall when PMC doesn't have the paper.
+ * Unpaywall is free (no API key), just needs an email parameter.
+ * Returns base64-encoded PDF, or null if unavailable.
+ */
+export async function fetchPDFFromUnpaywall(doi: string): Promise<string | null> {
+  try {
+    const apiUrl = `https://api.unpaywall.org/v2/${encodeURIComponent(doi)}?email=fhirlitpersonalize@gmail.com`;
+
+    const response = await fetch(apiUrl, {
+      headers: { 'User-Agent': 'FHIRLitPersonalize/1.0' },
+    });
+
+    if (!response.ok) {
+      console.log(`[Unpaywall] API returned ${response.status} for DOI ${doi}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    if (!data.is_oa) {
+      console.log(`[Unpaywall] DOI ${doi} is not open access`);
+      return null;
+    }
+
+    // Collect all OA locations with PDF URLs, prioritizing repository copies
+    const locations = (data.oa_locations || [])
+      .filter((loc: any) => loc.url_for_pdf)
+      .sort((a: any, b: any) => {
+        // Prefer repository copies (less bot protection) over publisher
+        if (a.host_type === 'repository' && b.host_type !== 'repository') return -1;
+        if (b.host_type === 'repository' && a.host_type !== 'repository') return 1;
+        // Prefer published version over submitted
+        if (a.version === 'publishedVersion' && b.version !== 'publishedVersion') return -1;
+        if (b.version === 'publishedVersion' && a.version !== 'publishedVersion') return 1;
+        return 0;
+      });
+
+    if (locations.length === 0) {
+      console.log(`[Unpaywall] No PDF URLs found for DOI ${doi}`);
+      return null;
+    }
+
+    // Try each location until one succeeds
+    for (const loc of locations) {
+      try {
+        console.log(`[Unpaywall] Trying PDF from ${loc.host_type}: ${loc.url_for_pdf}`);
+        const pdfResponse = await fetch(loc.url_for_pdf, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; FHIRLitPersonalize/1.0)',
+            'Accept': 'application/pdf',
+          },
+          redirect: 'follow',
+        });
+
+        if (!pdfResponse.ok) {
+          console.log(`[Unpaywall] PDF download failed (${pdfResponse.status}) from ${loc.url_for_pdf}`);
+          continue;
+        }
+
+        const contentType = pdfResponse.headers.get('content-type') || '';
+        if (!contentType.includes('pdf') && !contentType.includes('octet-stream')) {
+          console.log(`[Unpaywall] Response is not PDF: ${contentType}`);
+          continue;
+        }
+
+        const arrayBuffer = await pdfResponse.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        if (buffer.length < 5000) {
+          console.log(`[Unpaywall] PDF too small (${buffer.length} bytes), skipping`);
+          continue;
+        }
+
+        console.log(`[Unpaywall] Downloaded PDF for DOI ${doi}: ${(buffer.length / 1024).toFixed(0)} KB from ${loc.host_type}`);
+        return buffer.toString('base64');
+      } catch (dlError) {
+        console.log(`[Unpaywall] Failed to download from ${loc.url_for_pdf}:`, dlError);
+        continue;
+      }
+    }
+
+    console.log(`[Unpaywall] All ${locations.length} PDF locations failed for DOI ${doi}`);
+    return null;
+  } catch (error) {
+    console.error('[Unpaywall] Error:', error);
+    return null;
+  }
+}
+
+/**
  * Parse article metadata from NCBI efetch XML response
  */
 function parseArticleXML(xmlText: string, pmid: string): PaperMetadata {
