@@ -131,8 +131,12 @@ If the study requires ANY ONE of several conditions (OR logic), set "requiredCon
 If the study requires ALL conditions (AND logic), set "requiredConditionLogic": "AND" (default)
 
 Example: FOURIER required ASCVD defined as prior MI OR prior stroke OR PAD:
-"requiredConditions": ["prior myocardial infarction", "prior stroke", "peripheral artery disease"],
+"requiredConditions": ["atherosclerotic cardiovascular disease", "coronary artery disease", "prior myocardial infarction", "prior stroke", "peripheral artery disease"],
 "requiredConditionLogic": "OR"
+
+IMPORTANT: When a study targets patients with atherosclerotic cardiovascular disease (ASCVD),
+ALWAYS include BOTH the broad category AND the specific qualifying conditions.
+A patient with coronary artery disease IS an ASCVD patient and should qualify.
 
 ## General
 - If a value is not mentioned in the paper, omit that field

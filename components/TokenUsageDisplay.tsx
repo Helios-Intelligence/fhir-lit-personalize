@@ -83,7 +83,7 @@ export function TokenUsageDisplay({ usage }: TokenUsageDisplayProps) {
             </tfoot>
           </table>
           <p className="text-[10px] text-gray-400 mt-2">
-            Model: {usage.calls[0]?.model || "gemini-2.0-flash"} &middot; Input: $0.10/1M tokens &middot; Output: $0.40/1M tokens
+            Model: {usage.calls[0]?.model || "gemini-2.5-flash"} &middot; Input: $0.30/1M tokens &middot; Output: $2.50/1M tokens
           </p>
         </div>
       )}

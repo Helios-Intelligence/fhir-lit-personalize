@@ -441,12 +441,38 @@ const MEDICATION_CODES: Record<string, { rxnorm: string[], terms: string[] }> = 
 };
 
 /**
+ * Parent condition mappings: if a patient has a broader condition,
+ * they qualify for checks on more specific sub-conditions.
+ * e.g., "coronary artery disease" qualifies for "prior myocardial infarction" checks
+ */
+const CONDITION_PARENTS: Record<string, string[]> = {
+  'prior myocardial infarction': ['atherosclerotic cardiovascular disease', 'coronary artery disease', 'cardiovascular disease'],
+  'prior stroke': ['atherosclerotic cardiovascular disease', 'cardiovascular disease'],
+  'peripheral artery disease': ['atherosclerotic cardiovascular disease', 'cardiovascular disease'],
+};
+
+/**
  * Check if patient has a specific condition
- * Uses SNOMED, ICD-10 codes and semantic text matching
+ * Uses SNOMED, ICD-10 codes, semantic text matching, and hierarchical condition matching
  */
 export function hasCondition(patient: ExtractedPatient, conditionIdentifier: string): boolean {
   const normalized = conditionIdentifier.toLowerCase().trim();
 
+  // Direct match first
+  if (hasConditionDirect(patient, normalized)) return true;
+
+  // Check if patient has a broader parent condition that qualifies
+  const parents = CONDITION_PARENTS[normalized];
+  if (parents) {
+    for (const parent of parents) {
+      if (hasConditionDirect(patient, parent)) return true;
+    }
+  }
+
+  return false;
+}
+
+function hasConditionDirect(patient: ExtractedPatient, normalized: string): boolean {
   // Get condition class definition (codes + terms)
   const conditionClass = CONDITION_CODES[normalized];
   const snomedCodes = conditionClass?.snomed || [];
@@ -457,7 +483,7 @@ export function hasCondition(patient: ExtractedPatient, conditionIdentifier: str
     // Check SNOMED code match
     if (cond.snomedCode) {
       if (snomedCodes.includes(cond.snomedCode)) return true;
-      if (cond.snomedCode === conditionIdentifier) return true;
+      if (cond.snomedCode === normalized) return true;
     }
 
     // Check ICD-10 code match (with prefix matching for subcodes)
