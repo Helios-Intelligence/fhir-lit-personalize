@@ -62,6 +62,7 @@ export function PaperInput({
   const [isFetching, setIsFetching] = useState(false);
   const [fetchedPaper, setFetchedPaper] = useState<PaperMetadata | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [abstractOnly, setAbstractOnly] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const handlePdfUpload = useCallback(
@@ -135,6 +136,7 @@ export function PaperInput({
     setIsFetching(true);
     setFetchError(null);
     setFetchedPaper(null);
+    setAbstractOnly(false);
 
     try {
       const response = await fetch("/api/fetch-paper", {
@@ -158,6 +160,7 @@ export function PaperInput({
       }
 
       setFetchedPaper(data.metadata);
+      setAbstractOnly(!!data.hasAbstractOnly);
       onPaperText(data.text, type, data.metadata);
     } catch (error) {
       const message =
@@ -207,6 +210,7 @@ export function PaperInput({
     setIdentifier("");
     setFetchedPaper(null);
     setFetchError(null);
+    setAbstractOnly(false);
   }, []);
 
   const isProcessing = isUploading || isFetching || isLoading;
@@ -367,6 +371,11 @@ export function PaperInput({
                   fetchError ? "text-amber-600" : "text-green-600"
                 )}>
                   {fetchedPaper.journal}
+                </p>
+              )}
+              {abstractOnly && !fetchError && (
+                <p className="text-xs text-amber-600 mt-1">
+                  Abstract only — full text not available in PubMed Central. Upload the PDF for better results.
                 </p>
               )}
               {fetchError && (
