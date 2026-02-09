@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchByPMID, fetchByDOI, fetchFullTextFromPMC } from '@/lib/ncbi';
+import { fetchByPMID, fetchByDOI, fetchFullTextFromPMC, fetchPDFFromPMC } from '@/lib/ncbi';
 
 export const runtime = 'nodejs';
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 interface FetchPaperRequest {
   identifier: string;
@@ -63,8 +63,18 @@ export async function POST(request: NextRequest) {
 
     // Try to get full text from PMC
     let fullText: string | null = null;
+    let pmcid: string | null = null;
+    let pdfBase64: string | null = null;
+
     if (metadata.pmid) {
-      fullText = await fetchFullTextFromPMC(metadata.pmid);
+      const pmcResult = await fetchFullTextFromPMC(metadata.pmid);
+      fullText = pmcResult.text;
+      pmcid = pmcResult.pmcid;
+
+      // If we have a PMCID, also fetch the PDF for multimodal processing
+      if (pmcid) {
+        pdfBase64 = await fetchPDFFromPMC(pmcid);
+      }
     }
 
     // Determine what text we have
@@ -93,6 +103,8 @@ export async function POST(request: NextRequest) {
       text,
       isOpenAccess: hasFullText,
       hasAbstractOnly: !hasFullText && !!metadata.abstract,
+      hasPdf: !!pdfBase64,
+      pdfBase64: pdfBase64 || undefined,
       metadata: {
         title: metadata.title,
         authors: metadata.authors,

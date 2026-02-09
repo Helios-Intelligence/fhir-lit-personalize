@@ -10,9 +10,10 @@ if (!GOOGLE_API_KEY) {
 }
 
 /**
- * Parse paper text using Gemini Flash to extract structured data
+ * Parse paper text using Gemini Flash to extract structured data.
+ * When pdfBase64 is provided, sends the PDF as multimodal input for figure/table extraction.
  */
-export async function parsePaperWithLLM(paperText: string): Promise<{ paper: ParsedPaper; usage: LLMCallUsage }> {
+export async function parsePaperWithLLM(paperText: string, pdfBase64?: string): Promise<{ paper: ParsedPaper; usage: LLMCallUsage }> {
   if (!GOOGLE_API_KEY) {
     throw new Error('GOOGLE_API_KEY is not configured');
   }
@@ -37,7 +38,16 @@ export async function parsePaperWithLLM(paperText: string): Promise<{ paper: Par
   });
 
   try {
-    const result = await model.generateContent(prompt);
+    // Use multimodal input when PDF is available
+    let result;
+    if (pdfBase64) {
+      result = await model.generateContent([
+        { inlineData: { mimeType: 'application/pdf', data: pdfBase64 } },
+        { text: prompt },
+      ]);
+    } else {
+      result = await model.generateContent(prompt);
+    }
     const usage = extractUsage(result.response, 'Parse Paper');
     const responseText = result.response.text().trim();
 

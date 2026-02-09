@@ -17,12 +17,13 @@ interface ParsePaperRequest {
   paperText: string;
   source: 'pdf' | 'pmid' | 'doi';
   metadata?: PaperMetadata;
+  pdfBase64?: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: ParsePaperRequest = await request.json();
-    const { paperText, source, metadata } = body;
+    const { paperText, source, metadata, pdfBase64 } = body;
 
     if (!paperText) {
       return NextResponse.json(
@@ -38,8 +39,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse paper with LLM
-    const { paper: parsedPaper, usage } = await parsePaperWithLLM(paperText);
+    // Parse paper with LLM (multimodal when PDF is available)
+    const { paper: parsedPaper, usage } = await parsePaperWithLLM(paperText, pdfBase64);
 
     // Prefer metadata title (from PubMed) — it's authoritative
     if (metadata?.title) {

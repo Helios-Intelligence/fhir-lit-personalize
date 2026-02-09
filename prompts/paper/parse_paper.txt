@@ -138,6 +138,13 @@ IMPORTANT: When a study targets patients with atherosclerotic cardiovascular dis
 ALWAYS include BOTH the broad category AND the specific qualifying conditions.
 A patient with coronary artery disease IS an ASCVD patient and should qualify.
 
+## Figure and Table Extraction (when PDF is attached)
+When a PDF document is attached alongside this text, also examine all visual content:
+- **Figures**: Look for Kaplan-Meier survival curves (extract event rates), forest plots (extract subgroup HRs), biomarker trajectory charts
+- **Tables**: Extract baseline characteristics, primary/secondary endpoints, and subgroup analyses from tables that may contain data not in the text
+- **Charts**: Look for bar charts or line graphs showing biomarker changes over time
+- Use data from figures and tables to fill in any fields that are missing from the text alone (e.g., baselineEventRate from a Kaplan-Meier curve, biomarkerEffects from a waterfall plot)
+
 ## General
 - If a value is not mentioned in the paper, omit that field
 - Do NOT include qualifiers like "(preferably)", "(at least)", "(with or without)" in the arrays

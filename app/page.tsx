@@ -32,6 +32,8 @@ export default function Home() {
     null
   );
   const [paperMetadata, setPaperMetadata] = useState<PaperMetadata | null>(null);
+  const [pdfBase64, setPdfBase64] = useState<string | null>(null);
+  const [includeFigures, setIncludeFigures] = useState(true);
   const [parsedPaper, setParsedPaper] = useState<ParsedPaper | null>(null);
   const [currentStep, setCurrentStep] = useState<PipelineStep>("idle");
   const [result, setResult] = useState<PipelineResult | null>(null);
@@ -60,10 +62,11 @@ export default function Home() {
   }, []);
 
   const handlePaperText = useCallback(
-    (text: string, source: "pdf" | "pmid" | "doi", metadata?: PaperMetadata) => {
+    (text: string, source: "pdf" | "pmid" | "doi", metadata?: PaperMetadata, pdf?: string) => {
       setPaperText(text);
       setPaperSource(source);
       setPaperMetadata(metadata || null);
+      setPdfBase64(pdf || null);
       setError(null);
     },
     []
@@ -82,16 +85,20 @@ export default function Home() {
     setTokenUsage(null);
 
     try {
-      // Step 1: Parse paper
+      // Step 1: Parse paper (with optional PDF for figure extraction)
       setCurrentStep("parsing-paper");
+      const parseBody: Record<string, unknown> = {
+        paperText,
+        source: paperSource,
+        metadata: paperMetadata,
+      };
+      if (includeFigures && pdfBase64) {
+        parseBody.pdfBase64 = pdfBase64;
+      }
       const parseResponse = await fetch("/api/parse-paper", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          paperText,
-          source: paperSource,
-          metadata: paperMetadata,
-        }),
+        body: JSON.stringify(parseBody),
       });
 
       const parseData = await parseResponse.json();
@@ -166,6 +173,7 @@ export default function Home() {
     setPaperText(null);
     setPaperSource(null);
     setPaperMetadata(null);
+    setPdfBase64(null);
     setParsedPaper(null);
     setCurrentStep("idle");
     setResult(null);
@@ -229,6 +237,27 @@ export default function Home() {
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
+              )}
+
+              {/* Figure extraction toggle */}
+              {pdfBase64 && (
+                <div className="mt-4">
+                  <label className="flex items-center gap-2 px-3 py-2 rounded-md bg-purple-50 border border-purple-200 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={includeFigures}
+                      onChange={(e) => setIncludeFigures(e.target.checked)}
+                      className="rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                      disabled={isProcessing}
+                    />
+                    <span className="text-sm text-purple-800">
+                      Include figures &amp; tables
+                    </span>
+                    <span className="text-xs text-purple-500">
+                      (sends PDF to AI for visual analysis)
+                    </span>
+                  </label>
+                </div>
               )}
 
               {/* Action Buttons */}

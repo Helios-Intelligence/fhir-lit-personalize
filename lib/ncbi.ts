@@ -66,9 +66,10 @@ export async function fetchByDOI(doi: string): Promise<PaperMetadata> {
 }
 
 /**
- * Try to fetch full text from PMC if available
+ * Try to fetch full text from PMC if available.
+ * Returns the full text and the PMCID (for PDF download).
  */
-export async function fetchFullTextFromPMC(pmid: string): Promise<string | null> {
+export async function fetchFullTextFromPMC(pmid: string): Promise<{ text: string | null; pmcid: string | null }> {
   try {
     // First check if paper is in PMC
     const linkUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi';
@@ -82,7 +83,7 @@ export async function fetchFullTextFromPMC(pmid: string): Promise<string | null>
     });
 
     const linkResponse = await fetch(`${linkUrl}?${linkParams}`);
-    if (!linkResponse.ok) return null;
+    if (!linkResponse.ok) return { text: null, pmcid: null };
 
     const linkResult = await linkResponse.json();
 
@@ -93,7 +94,7 @@ export async function fetchFullTextFromPMC(pmid: string): Promise<string | null>
 
     if (!pmcLinks?.links?.[0]) {
       console.log(`[NCBI] No PMC full text available for PMID ${pmid} (paper may not be open access)`);
-      return null;
+      return { text: null, pmcid: null };
     }
 
     const pmcid = pmcLinks.links[0];
@@ -110,11 +111,56 @@ export async function fetchFullTextFromPMC(pmid: string): Promise<string | null>
     });
 
     const pmcResponse = await fetch(`${pmcUrl}?${pmcParams}`);
-    if (!pmcResponse.ok) return null;
+    if (!pmcResponse.ok) return { text: null, pmcid };
 
-    return await pmcResponse.text();
+    const text = await pmcResponse.text();
+    return { text, pmcid };
   } catch (error) {
     console.error('Error fetching full text from PMC:', error);
+    return { text: null, pmcid: null };
+  }
+}
+
+/**
+ * Download PDF from PMC for open-access papers
+ * Returns base64-encoded PDF, or null if unavailable
+ */
+export async function fetchPDFFromPMC(pmcid: string): Promise<string | null> {
+  try {
+    // PMC PDF URL pattern
+    const pdfUrl = `https://www.ncbi.nlm.nih.gov/pmc/articles/PMC${pmcid}/pdf/`;
+
+    const response = await fetch(pdfUrl, {
+      headers: {
+        'User-Agent': 'FHIRLitPersonalize/1.0 (contact@example.com)',
+      },
+      redirect: 'follow',
+    });
+
+    if (!response.ok) {
+      console.log(`[NCBI] PDF not available for PMC${pmcid}: ${response.status}`);
+      return null;
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('pdf')) {
+      console.log(`[NCBI] Response for PMC${pmcid} is not PDF: ${contentType}`);
+      return null;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Sanity check: PDFs should be at least a few KB
+    if (buffer.length < 1000) {
+      console.log(`[NCBI] PDF for PMC${pmcid} too small (${buffer.length} bytes), skipping`);
+      return null;
+    }
+
+    console.log(`[NCBI] Downloaded PDF for PMC${pmcid}: ${(buffer.length / 1024).toFixed(0)} KB`);
+    return buffer.toString('base64');
+  } catch (error) {
+    console.error(`Error fetching PDF from PMC${pmcid}:`, error);
     return null;
   }
 }

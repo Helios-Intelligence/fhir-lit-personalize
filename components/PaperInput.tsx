@@ -14,7 +14,7 @@ interface PaperMetadata {
 }
 
 interface PaperInputProps {
-  onPaperText: (text: string, source: "pdf" | "pmid" | "doi", metadata?: PaperMetadata) => void;
+  onPaperText: (text: string, source: "pdf" | "pmid" | "doi", metadata?: PaperMetadata, pdfBase64?: string) => void;
   onError: (error: string) => void;
   disabled?: boolean;
   isLoading?: boolean;
@@ -63,6 +63,7 @@ export function PaperInput({
   const [fetchedPaper, setFetchedPaper] = useState<PaperMetadata | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [abstractOnly, setAbstractOnly] = useState(false);
+  const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const handlePdfUpload = useCallback(
@@ -73,6 +74,7 @@ export function PaperInput({
       setFetchedPaper(null);
       setFetchError(null);
       setIdentifier("");
+      setPdfBase64(null);
 
       try {
         const formData = new FormData();
@@ -90,13 +92,15 @@ export function PaperInput({
         }
 
         setPdfProcessed(true);
-        onPaperText(data.text, "pdf");
+        setPdfBase64(data.pdfBase64 || null);
+        onPaperText(data.text, "pdf", undefined, data.pdfBase64 || undefined);
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Failed to upload PDF";
         onError(message);
         setPdfFile(null);
         setPdfProcessed(false);
+        setPdfBase64(null);
       } finally {
         setIsUploading(false);
       }
@@ -161,7 +165,8 @@ export function PaperInput({
 
       setFetchedPaper(data.metadata);
       setAbstractOnly(!!data.hasAbstractOnly);
-      onPaperText(data.text, type, data.metadata);
+      setPdfBase64(data.pdfBase64 || null);
+      onPaperText(data.text, type, data.metadata, data.pdfBase64 || undefined);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to fetch paper";
@@ -204,6 +209,7 @@ export function PaperInput({
   const clearPdf = useCallback(() => {
     setPdfFile(null);
     setPdfProcessed(false);
+    setPdfBase64(null);
   }, []);
 
   const clearIdentifier = useCallback(() => {
@@ -211,6 +217,7 @@ export function PaperInput({
     setFetchedPaper(null);
     setFetchError(null);
     setAbstractOnly(false);
+    setPdfBase64(null);
   }, []);
 
   const isProcessing = isUploading || isFetching || isLoading;
@@ -389,6 +396,7 @@ export function PaperInput({
           Enter a PubMed ID or DOI. The paper will be fetched automatically.
         </p>
       </div>
+
     </div>
   );
 }

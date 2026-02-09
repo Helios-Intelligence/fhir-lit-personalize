@@ -44,9 +44,13 @@ export async function POST(request: NextRequest) {
     // Extract text
     const text = await extractTextFromPDF(buffer);
 
+    // Return base64 PDF for optional multimodal processing
+    const pdfBase64 = buffer.toString('base64');
+
     return NextResponse.json({
       success: true,
       text,
+      pdfBase64,
       metadata: {
         pageCount: metadata.pageCount,
         title: metadata.title,
