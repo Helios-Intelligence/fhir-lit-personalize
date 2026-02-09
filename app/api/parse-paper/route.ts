@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parsePaperWithLLM, summarizePaperFindings } from '@/lib/paper-parser';
+import { buildUsageSummary } from '@/lib/token-tracker';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
       parsedPaper,
       findingsSummary,
       source,
-      tokenUsage: [usage],
+      tokenUsage: buildUsageSummary([usage]),
     });
   } catch (error) {
     console.error('Parse paper error:', error);

@@ -100,7 +100,7 @@ export default function Home() {
       }
 
       const parsed = parseData.parsedPaper as ParsedPaper;
-      const parseUsageCalls: LLMCallUsage[] = parseData.tokenUsage || [];
+      const parseUsageCalls: LLMCallUsage[] = parseData.tokenUsage?.calls || [];
 
       // Use metadata title if parsed title is missing
       if (!parsed.title && paperMetadata?.title) {
