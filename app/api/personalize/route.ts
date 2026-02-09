@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { checkApplicability } from '@/lib/applicability-checker';
 import { loadPromptWithVariables } from '@/lib/prompt-loader';
 import { getBiomarkerValue } from '@/lib/fhir-extractor';
+import { extractUsage, buildUsageSummary, type LLMCallUsage } from '@/lib/token-tracker';
 import type { ParsedPaper } from '@/lib/types/paper';
 import type { ExtractedPatient } from '@/lib/types/patient';
 import type { PipelineResult, PersonalizedResult, PatientSummary, PaperSummary } from '@/lib/types/result';
@@ -104,6 +105,12 @@ export async function POST(request: NextRequest) {
 
     // Step 3: Check applicability
     const applicability = await checkApplicability(patient, parsedPaper);
+    const usageCalls: LLMCallUsage[] = [];
+
+    // Collect applicability usage if present
+    if (applicability.usage) {
+      usageCalls.push(applicability.usage);
+    }
 
     if (!applicability.isApplicable) {
       const result: PipelineResult = {
@@ -111,6 +118,7 @@ export async function POST(request: NextRequest) {
         applicability,
         patientSummary,
         paperSummary,
+        tokenUsage: buildUsageSummary(usageCalls),
       };
 
       return NextResponse.json(result);
@@ -124,7 +132,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const personalizedResult = await generatePersonalizedOutput(patient, parsedPaper, patientSummary);
+    const { result: personalizedResult, usage: outputUsage } = await generatePersonalizedOutput(patient, parsedPaper, patientSummary);
+    usageCalls.push(outputUsage);
 
     const result: PipelineResult = {
       success: true,
@@ -132,6 +141,7 @@ export async function POST(request: NextRequest) {
       personalizedResult,
       patientSummary,
       paperSummary,
+      tokenUsage: buildUsageSummary(usageCalls),
     };
 
     return NextResponse.json(result);
@@ -156,7 +166,7 @@ async function generatePersonalizedOutput(
   patient: ExtractedPatient,
   paper: ParsedPaper,
   patientSummary: PatientSummary
-): Promise<PersonalizedResult> {
+): Promise<{ result: PersonalizedResult; usage: LLMCallUsage }> {
   const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY!);
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.0-flash',
@@ -254,8 +264,9 @@ async function generatePersonalizedOutput(
     STUDY_FINDINGS: findingsLines.join('\n'),
   });
 
-  const result = await model.generateContent(prompt);
-  const responseText = result.response.text().trim();
+  const genResult = await model.generateContent(prompt);
+  const usage = extractUsage(genResult.response, 'Generate Output');
+  const responseText = genResult.response.text().trim();
 
   // Parse JSON response
   const cleaned = responseText
@@ -266,9 +277,12 @@ async function generatePersonalizedOutput(
   const parsed = JSON.parse(cleaned);
 
   return {
-    studySummary: parsed.studySummary || 'Unable to generate summary',
-    patientProjection: parsed.patientProjection || 'Unable to generate projection',
-    contextualizedRisk: parsed.contextualizedRisk || 'Unable to generate risk context',
-    suggestedAction: parsed.suggestedAction || 'Discuss these findings with your healthcare provider.',
+    result: {
+      studySummary: parsed.studySummary || 'Unable to generate summary',
+      patientProjection: parsed.patientProjection || 'Unable to generate projection',
+      contextualizedRisk: parsed.contextualizedRisk || 'Unable to generate risk context',
+      suggestedAction: parsed.suggestedAction || 'Discuss these findings with your healthcare provider.',
+    },
+    usage,
   };
 }

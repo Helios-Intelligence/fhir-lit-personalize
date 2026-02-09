@@ -10,7 +10,9 @@ import { ApplicabilityAlert } from "@/components/ApplicabilityAlert";
 import { PatientSummary } from "@/components/PatientSummary";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { TokenUsageDisplay } from "@/components/TokenUsageDisplay";
 import type { PipelineStep, PipelineResult } from "@/lib/types/result";
+import type { TokenUsageSummary, LLMCallUsage } from "@/lib/token-tracker";
 import type { ParsedPaper } from "@/lib/types/paper";
 import { extractPatientDataClient } from "@/lib/fhir-extractor-client";
 
@@ -33,6 +35,7 @@ export default function Home() {
   const [parsedPaper, setParsedPaper] = useState<ParsedPaper | null>(null);
   const [currentStep, setCurrentStep] = useState<PipelineStep>("idle");
   const [result, setResult] = useState<PipelineResult | null>(null);
+  const [tokenUsage, setTokenUsage] = useState<TokenUsageSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleFhirAccepted = useCallback((bundle: any | null) => {
@@ -76,6 +79,7 @@ export default function Home() {
     setError(null);
     setResult(null);
     setParsedPaper(null);
+    setTokenUsage(null);
 
     try {
       // Step 1: Parse paper
@@ -96,6 +100,7 @@ export default function Home() {
       }
 
       const parsed = parseData.parsedPaper as ParsedPaper;
+      const parseUsageCalls: LLMCallUsage[] = parseData.tokenUsage || [];
 
       // Use metadata title if parsed title is missing
       if (!parsed.title && paperMetadata?.title) {
@@ -134,6 +139,17 @@ export default function Home() {
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
+      // Aggregate token usage from both API calls
+      const personalizeCalls: LLMCallUsage[] = personalizeData.tokenUsage?.calls || [];
+      const allCalls = [...parseUsageCalls, ...personalizeCalls];
+      const combinedUsage: TokenUsageSummary = {
+        calls: allCalls,
+        totalInputTokens: allCalls.reduce((s, c) => s + c.inputTokens, 0),
+        totalOutputTokens: allCalls.reduce((s, c) => s + c.outputTokens, 0),
+        totalCost: allCalls.reduce((s, c) => s + c.totalCost, 0),
+      };
+      setTokenUsage(combinedUsage);
+
       setResult(personalizeData);
       setCurrentStep("complete");
     } catch (err) {
@@ -153,6 +169,7 @@ export default function Home() {
     setParsedPaper(null);
     setCurrentStep("idle");
     setResult(null);
+    setTokenUsage(null);
     setError(null);
   };
 
@@ -332,6 +349,11 @@ export default function Home() {
                   <PersonalizedResult result={result.personalizedResult} />
                 ) : null}
               </div>
+            )}
+
+            {/* Token Usage */}
+            {tokenUsage && tokenUsage.calls.length > 0 && (
+              <TokenUsageDisplay usage={tokenUsage} />
             )}
 
             {/* Placeholder when no results */}

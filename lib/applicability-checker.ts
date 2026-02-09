@@ -4,6 +4,7 @@ import type { ExtractedPatient } from './types/patient';
 import type { ParsedPaper } from './types/paper';
 import type { ApplicabilityResult, ApplicabilityReason } from './types/result';
 import { getBiomarkerValue, hasCondition, hasMedication } from './fhir-extractor';
+import { extractUsage, type LLMCallUsage } from './token-tracker';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
@@ -168,6 +169,7 @@ async function performLLMCheck(
 
   try {
     const result = await model.generateContent(prompt);
+    const usage = extractUsage(result.response, 'Check Applicability');
     const responseText = result.response.text().trim();
 
     // Parse JSON response
@@ -185,6 +187,7 @@ async function performLLMCheck(
         description: r.description || '',
         details: r.details,
       })),
+      usage,
     };
   } catch (error) {
     console.error('LLM applicability check failed:', error);

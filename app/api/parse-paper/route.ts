@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse paper with LLM
-    const parsedPaper = await parsePaperWithLLM(paperText);
+    const { paper: parsedPaper, usage } = await parsePaperWithLLM(paperText);
 
     // Use metadata title if LLM didn't extract one
     if (!parsedPaper.title && metadata?.title) {
@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
       parsedPaper,
       findingsSummary,
       source,
+      tokenUsage: [usage],
     });
   } catch (error) {
     console.error('Parse paper error:', error);

@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { loadPromptWithVariables } from './prompt-loader';
 import { ParsedPaperSchema, type ParsedPaper } from './types/paper';
+import { extractUsage, type LLMCallUsage } from './token-tracker';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
@@ -11,7 +12,7 @@ if (!GOOGLE_API_KEY) {
 /**
  * Parse paper text using Gemini Flash to extract structured data
  */
-export async function parsePaperWithLLM(paperText: string): Promise<ParsedPaper> {
+export async function parsePaperWithLLM(paperText: string): Promise<{ paper: ParsedPaper; usage: LLMCallUsage }> {
   if (!GOOGLE_API_KEY) {
     throw new Error('GOOGLE_API_KEY is not configured');
   }
@@ -37,6 +38,7 @@ export async function parsePaperWithLLM(paperText: string): Promise<ParsedPaper>
 
   try {
     const result = await model.generateContent(prompt);
+    const usage = extractUsage(result.response, 'Parse Paper');
     const responseText = result.response.text().trim();
 
     // Parse JSON response
@@ -60,7 +62,7 @@ export async function parsePaperWithLLM(paperText: string): Promise<ParsedPaper>
 
     // Validate with Zod schema
     const validated = ParsedPaperSchema.parse(parsed);
-    return validated;
+    return { paper: validated, usage };
   } catch (error) {
     console.error('Error parsing paper:', error);
     if (error instanceof Error) {

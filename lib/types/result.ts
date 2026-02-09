@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { ExtractedPatient } from './patient';
 import type { ParsedPaper } from './paper';
+import type { TokenUsageSummary, LLMCallUsage } from '../token-tracker';
 
 /**
  * Schema for personalized result from LLM
@@ -20,6 +21,7 @@ export type PersonalizedResult = z.infer<typeof PersonalizedResultSchema>;
 export interface ApplicabilityResult {
   isApplicable: boolean;
   reasons: ApplicabilityReason[];
+  usage?: LLMCallUsage;
 }
 
 export interface ApplicabilityReason {
@@ -37,6 +39,7 @@ export interface PipelineResult {
   personalizedResult?: PersonalizedResult;
   patientSummary?: PatientSummary;
   paperSummary?: PaperSummary;
+  tokenUsage?: TokenUsageSummary;
   error?: string;
 }
 
